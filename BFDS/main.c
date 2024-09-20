@@ -3,6 +3,10 @@
 #include <string.h>
 #include <locale.h>
 
+
+
+
+
 typedef struct Client Client, *Cp;
 struct Client
 {
@@ -41,12 +45,18 @@ int main(int argc, char *argv[])
     Ethereum.TaxaCompra = 0.01;
     Ethereum.TaxaVenda = 0.02;
 
+
+
+
+
+
+
+
+
+
     system("pause");	
 	return 0;
 }
-
-
-
 
 
 
