@@ -4,12 +4,6 @@
 #include <locale.h>
 #include <stdbool.h>
 
-void DebugCotacoes(double bitcoin, double ethereum, double ripple);
-void DebugUser(Cpointer pClients, int index);
-void SaveCotacoes(double bitcoin, double ethereum, double ripple, char *nomeArquivo);
-void SaveUsers(Cpointer pClients, char *nomeArquivo);
-int PedirSenha(char userSenha[7]);
-
 typedef struct Client
 {
 
@@ -33,6 +27,12 @@ struct Moeda
     double TaxaCompra;
 
 };
+
+void DebugCotacoes(double bitcoin, double ethereum, double ripple);
+void DebugUser(Cpointer pClients, int index);
+void SaveCotacoes(double bitcoin, double ethereum, double ripple, char *nomeArquivo);
+void SaveUsers(Cpointer pClients, char *nomeArquivo);
+int PedirSenha(char userSenha[7]);
 
 int main(int argc, char *argv[]) 
 {
@@ -90,12 +90,10 @@ int main(int argc, char *argv[])
     char respostaUser[20];
     while (true)
     {
-        while (true)
-        {
             printf("digite seu cpf:\n");
             scanf(" %s", respostaUser);
             if(strlen(respostaUser) > 11){
-                printf("Senha digitada inválida, quantidade de caracteres excedida:\n");
+                printf("CPF digitado inválido, quantidade de caracteres excedida:\n");
                 while (true)
                 {
                     printf("deseja continuar?\'s/n\'\n");
@@ -124,7 +122,6 @@ int main(int argc, char *argv[])
                 }
                 continue;
             }
-        }
         usuarioEncontrado = false;
         for (index = 0; index < 10; index++)
         {
@@ -142,7 +139,7 @@ int main(int argc, char *argv[])
         }
         if (usuarioEncontrado)
         {
-            
+            break;
         }
         else{
             printf("Usuário não encontrado.\n");
