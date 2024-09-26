@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
 
     int i;
     int index;
+    int quantDadosPegosDoSscanf;
 	
     Moeda bitcoin;
     Moeda ethereum;
@@ -57,23 +58,12 @@ int main(int argc, char *argv[])
 
     Cpointer pClients;
     pClients = (Cpointer)calloc(10, sizeof(Client));
-    if(pClients == NULL) return 1;
-
-    //isso aqui serve para ter um valor teste coerente com os dados armazenados para usar enquanto não se tem a funcao de pegar os dados
-    strcpy(pClients[0].Nome, "Josias");
-    strcpy(pClients[0].Cpf, "00000000011");
-    strcpy(pClients[0].Senha, "000001");
-    pClients[0].Reais = 0;
-    pClients[0].Bitcoin = 0;
-    pClients[0].Ethereum = 0;
-    pClients[0].Ripple = 0;
-
 
     pTxtCotacoes = fopen(Cotacoes, "r");
     if(pTxtCotacoes == NULL) return 2;
     fgets(leitor, sizeof(leitor), pTxtCotacoes);
     fgets(leitor, sizeof(leitor), pTxtCotacoes);
-    sscanf(leitor, "%lf,%lf,%lf", &bitcoin.Valor, &ethereum.Valor, &ripple.Valor);
+    quantDadosPegosDoSscanf = sscanf(leitor, "%lf,%lf,%lf", &bitcoin.Valor, &ethereum.Valor, &ripple.Valor);
     fclose(pTxtCotacoes);
     DebugCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor);
     
@@ -82,12 +72,18 @@ int main(int argc, char *argv[])
     index = 0;
     fgets(leitor, sizeof(leitor), pTxtUsers);
     while (fgets(leitor, sizeof(leitor), pTxtUsers)){
+        printf("\nleitor:\n%s", leitor);
+        quantDadosPegosDoSscanf = sscanf(leitor,"%[^,],%[^,],%[^,],%lf,%lf,%lf,%lf", pClients[index].Nome, pClients[index].Cpf, pClients[index].Senha, &pClients[index].Reais, &pClients[index].Bitcoin, &pClients[index].Ethereum, &pClients[index].Ripple);
+        printf("quantDadosPegosDoSscanf: %d\n\n", quantDadosPegosDoSscanf);
+        DebugUser(pClients[index].Nome,pClients[index].Cpf,pClients[index].Senha,pClients[index].Reais,pClients[index].Bitcoin,pClients[index].Ethereum,pClients[index].Ripple);
         index++;
     }
     fclose(pTxtUsers);
 
     system("pause");	
+    //SaveUsers(pClients, Users);
     //fclose(pTxtUsers);
+    //SaveCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor, Cotacoes);
     //fclose(pTxtCotacoes);
     free(pClients);
 	return 0;
@@ -102,10 +98,22 @@ void DebugUser(char Nome[21], char Cpf[12],char Senha[7],double Reais,double Bit
     printf("| nome: |%20s| |,| Cpf: |%11s| |,| Senha: |%6s| |,| Reais: |%.2lf| |,| Bitcoin: |%.2lf| |,| Ethereum: |%.2lf| |,| Ripple: |%.2lf| |;\n\n", Nome, Cpf, Senha, Reais, Bitcoin, Ethereum, Ripple);
 }
 
-void SaveCotacoes(){
-
+void SaveCotacoes(double bitcoin, double ethereum, double ripple, char *nomeArquivo){
+    FILE* destino;
+    destino = fopen(nomeArquivo, "w");
+    fprintf(destino,"Bitcoin,Ethereum,Ripple\n");
+    fprintf(destino,"%.2lf,%.2lf,%.2lf\n", bitcoin, ethereum, ripple);
+    fclose(destino);
 }
 
-void SaveUser(){
-    
+void SaveUsers(Cpointer pClients, char *nomeArquivo){
+    FILE* destino;
+    destino = fopen(nomeArquivo, "w");
+    fprintf(destino,"Nome,Cpf,Senha,Reais,Bitcoin,Ethereum,Ripple\n");
+    int c;
+    for (c = 0; c < 10; c++)
+    {
+        fprintf(destino, "%s,%s,%s,%.2lf,%.2lf,%.2lf,%.2lf\n", pClients[c].Nome, pClients[c].Cpf, pClients[c].Senha, pClients[c].Reais, pClients[c].Bitcoin, pClients[c].Ethereum, pClients[c].Ripple);
+    }
+    fclose(destino);
 }
