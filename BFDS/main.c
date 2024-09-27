@@ -37,6 +37,10 @@ void SaveUsers(Cpointer pClients, char *nomeArquivo);
 int PedirSenha(char userSenha[7]);
 
 
+void DepositarReais();
+
+
+
 int main(int argc, char *argv[]) 
 {
     setlocale(LC_ALL, "portuguese");
@@ -214,14 +218,14 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        if(respostaUser[0] == "1") ConsultarSaldo();
-        else if(respostaUser[0] == "2") ConsultarExtrato();
-        else if(respostaUser[0] == "3") DepositarReais();
-        else if(respostaUser[0] == "4") SacarReais();
-        else if(respostaUser[0] == "5") ComprarCriptomoedas();
-        else if(respostaUser[0] == "6") VenderCriptomoedas();
-        else if(respostaUser[0] == "7") AtualizarCotacoes();
-        else if(respostaUser[0] == "8") {
+        if(respostaUser[0] == '1') ConsultarSaldo();
+        else if(respostaUser[0] == '2') ConsultarExtrato();
+        else if(respostaUser[0] == '3') DepositarReais(pClients, userIndex);
+        else if(respostaUser[0] == '4') SacarReais();
+        else if(respostaUser[0] == '5') ComprarCriptomoedas();
+        else if(respostaUser[0] == '6') VenderCriptomoedas();
+        else if(respostaUser[0] == '7') AtualizarCotacoes();
+        else if(respostaUser[0] == '8') {
             SaveCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor, Cotacoes);
             SaveUsers(pClients, Users);
             break;
@@ -352,7 +356,21 @@ void ConsultarExtrato(){
 
 }
 
-void DepositarReais(){
+void DepositarReais(Cpointer pClients, int userIndex){
+
+    system("clear");
+
+    double deposito;
+    printf("Quantos reais gostaria de depositar?: ");
+    scanf(" %lf", &deposito);
+    
+    pClients[userIndex].Reais += deposito;
+
+    printf(" %lf",pClients[userIndex].Reais);
+
+    printf("\nPressione Enter para voltar ao menu principal\n");
+    getchar();
+    getchar();
 
 }
 
