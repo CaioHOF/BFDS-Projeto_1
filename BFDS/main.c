@@ -3,6 +3,7 @@
 #include <string.h>
 #include <locale.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 typedef struct Client
 {
@@ -28,11 +29,13 @@ struct Moeda
 
 };
 
+
 void DebugCotacoes(double bitcoin, double ethereum, double ripple);
 void DebugUser(Cpointer pClients, int index);
 void SaveCotacoes(double bitcoin, double ethereum, double ripple, char *nomeArquivo);
 void SaveUsers(Cpointer pClients, char *nomeArquivo);
 int PedirSenha(char userSenha[7]);
+
 
 int main(int argc, char *argv[]) 
 {
@@ -44,7 +47,9 @@ int main(int argc, char *argv[])
     char userCpf[12] = "";
     char userSenha[7] = "";
     char leitor[256];
+    char respostaUser[20];
 
+    int pedirSenha;
     int userIndex = -1;
     int i;
     int index;
@@ -70,58 +75,57 @@ int main(int argc, char *argv[])
     fgets(leitor, sizeof(leitor), pTxtCotacoes);
     quantDadosPegosDoSscanf = sscanf(leitor, "%lf,%lf,%lf", &bitcoin.Valor, &ethereum.Valor, &ripple.Valor);
     fclose(pTxtCotacoes);
-    DebugCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor);
+    //DebugCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor);//debug
     
     pTxtUsers = fopen(Users, "r");
     if(pTxtUsers == NULL) return 3;
     index = 0;
     fgets(leitor, sizeof(leitor), pTxtUsers);
     while (fgets(leitor, sizeof(leitor), pTxtUsers)){
-        printf("\nleitor:\n%s", leitor);//debug
+        //printf("\nleitor:\n%s", leitor);//debug
         quantDadosPegosDoSscanf = sscanf(leitor,"%[^,],%[^,],%[^,],%lf,%lf,%lf,%lf", pClients[index].Nome, pClients[index].Cpf, pClients[index].Senha, &pClients[index].Reais, &pClients[index].Bitcoin, &pClients[index].Ethereum, &pClients[index].Ripple);
-        printf("quantDadosPegosDoSscanf: %d\n\n", quantDadosPegosDoSscanf);//debug
+        //printf("quantDadosPegosDoSscanf: %d\n\n", quantDadosPegosDoSscanf);//debug
         index++;
     }
     fclose(pTxtUsers);
 
     //login
     bool usuarioEncontrado, cpfIgual;
-    int pedirSenha;
-    char respostaUser[20];
-    while (true)
-    {
-            printf("digite seu cpf:\n");
-            scanf(" %s", respostaUser);
-            if(strlen(respostaUser) > 11){
-                printf("CPF digitado inválido, quantidade de caracteres excedida:\n");
-                while (true)
-                {
-                    printf("deseja continuar?\'s/n\'\n");
-                    scanf(" %s", respostaUser);
-                    if(respostaUser[0] == 'n') break;
-                    else if (respostaUser[0] == 's') break;
-                    printf("resposta não reconhecida\n");
-                }
-                if(respostaUser[0] == 'n'){
-                    break;
-                }
-                continue;
+    while (true){
+        printf("digite seu cpf:\n");
+        scanf(" %s", respostaUser);
+        if(strlen(respostaUser) > 11){
+            printf("CPF digitado inválido, quantidade de caracteres excedida:\n");
+            while (true)
+            {
+                printf("deseja continuar?\'s/n\'\n");
+                scanf(" %s", respostaUser);
+                if(respostaUser[0] == 'n') break;
+                else if (respostaUser[0] == 's') break;
+                printf("resposta não reconhecida\n");
             }
-            else if(strlen(respostaUser) < 11){
-                printf("Senha digitada inválida, quantidade mínima de caracteres não preenchida:\n");
-                while (true)
-                {
-                    printf("deseja continuar?\'s/n\'\n");
-                    scanf(" %s", respostaUser);
-                    if(respostaUser[0] == 'n') break;
-                    else if (respostaUser[0] == 's') break;
-                    printf("resposta não reconhecida\n");
-                }
-                if(respostaUser[0] == 'n'){
-                    break;
-                }
-                continue;
+            if(respostaUser[0] == 'n'){
+                free(pClients);
+                return 0;
             }
+            continue;
+        }
+        else if(strlen(respostaUser) < 11){
+            printf("CPF digitado inválido, quantidade mínima de caracteres não preenchida:\n");
+            while (true)
+            {
+                printf("deseja continuar?\'s/n\'\n");
+                scanf(" %s", respostaUser);
+                if(respostaUser[0] == 'n') break;
+                else if (respostaUser[0] == 's') break;
+                printf("resposta não reconhecida\n");
+            }
+            if(respostaUser[0] == 'n'){
+                free(pClients);
+                return 0;
+            }
+            continue;
+        }
         usuarioEncontrado = false;
         for (index = 0; index < 10; index++)
         {
@@ -151,15 +155,20 @@ int main(int argc, char *argv[])
                 printf("resposta não reconhecida\n");
             }
             if(respostaUser[0] == 'n'){
-                break;
+                free(pClients);
+                return 0;
             }
         }
     }
     if(userIndex == -1 || userCpf == ""){
+        free(pClients);
         return 0;
     }
     pedirSenha = PedirSenha(userSenha);
-    if(pedirSenha == -1) return 0;
+    if(pedirSenha == -1){
+        free(pClients);  
+        return 0;
+    } 
     else if(!pedirSenha){
         while (!pedirSenha)
         {
@@ -172,21 +181,70 @@ int main(int argc, char *argv[])
                 printf("resposta não reconhecida\n");
             }
             if(respostaUser[0] == 'n'){
-                break;
+                free(pClients);
+                return 0;
             }
             pedirSenha = PedirSenha(userSenha);
-            if(pedirSenha == -1) return 0;
-        }
-        if(respostaUser[0] == 'n'){
-            return 0;
+            if(pedirSenha == -1){
+                free(pClients);
+                return 0;
+            }
         }
     }
     //menu
     while(true){
-        /*menu*/
+        system("clear");
+        printf("Bem vindo %s!!\n\n", pClients[userIndex].Nome);
+        sleep(2);
+        printf("     _-+={Menu}=+-_     \n\n");
+        printf("  {1} - Consultar saldo   \n");
+        printf(" {2} - Consultar extrato  \n");
+        printf("  {3} - Depositar reais   \n");
+        printf("    {4} - Sacar reais   \n");
+        printf("{5} - Comprar criptomoedas   \n");
+        printf("{6} - Vender criptomoedas   \n");
+        printf(" {7} - Atualizar cotação   \n");
+        printf("       {8} - Sair   \n\n");
+
+        printf("Selecione sua opção:\n");
+        scanf(" %s", respostaUser);
+        sleep(1);
+        if(strlen(respostaUser) > 1){
+            printf("\n formatação incorreta, digite apenas o numero referente a função a ser utilizada\n");
+            continue;
+        }
+
+        if(respostaUser[0] == "1") ConsultarSaldo();
+        else if(respostaUser[0] == "2") ConsultarExtrato();
+        else if(respostaUser[0] == "3") DepositarReais();
+        else if(respostaUser[0] == "4") SacarReais();
+        else if(respostaUser[0] == "5") ComprarCriptomoedas();
+        else if(respostaUser[0] == "6") VenderCriptomoedas();
+        else if(respostaUser[0] == "7") AtualizarCotacoes();
+        else if(respostaUser[0] == "8") {
+            SaveCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor, Cotacoes);
+            SaveUsers(pClients, Users);
+            break;
+        }
+        else{
+            for(i = 0; i < 4; i++){
+                printf(".");
+                sleep(1);
+            }
+            printf("\n");
+            for(i = 0; i < 3; i++){
+                printf("?");
+                sleep(1);
+            }
+            printf("!\n");
+            continue;
+        }
+        SaveCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor, Cotacoes);
+        SaveUsers(pClients, Users);
     }
 
-    system("pause");	
+
+    system("pause");
     free(pClients);
 	return 0;
 
@@ -284,4 +342,32 @@ int PedirSenha(char userSenhaCerta[7]){
         }
         return 1;
     }
+}
+
+void ConsultarSaldo(){
+
+}
+
+void ConsultarExtrato(){
+
+}
+
+void DepositarReais(){
+
+}
+
+void SacarReais(){
+
+}
+
+void ComprarCriptomoedas(){
+
+}
+
+void VenderCriptomoedas(){
+
+}
+
+void AtualizarCotacoes(){
+
 }
