@@ -364,7 +364,8 @@ void ConsultarSaldo(Cpointer pClients, int userIndex) {
     printf("Saldo em Ripple: %.6lf XRP\n", pClients[userIndex].Ripple);
 
     printf("\nPressione Enter para voltar ao menu principal\n");
-    getchar();  
+    getchar();
+    getchar();
 }
 
 void ConsultarExtrato(){
