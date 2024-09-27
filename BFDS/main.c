@@ -5,8 +5,18 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-typedef struct Client
-{
+typedef struct Extrato{
+    
+    char Usuario[21];
+    char cpf[12];
+    char* TipoMoeda;
+    char TipoTransacao;
+    int IndiceAtual;
+
+}Extrato, *EPointer;
+
+
+typedef struct Client{
 
     char Nome[21];
     char Cpf[12];
@@ -19,8 +29,7 @@ typedef struct Client
 
 }Client, *CPointer;
 
-typedef struct Moeda
-{
+typedef struct Moeda{
 
     char* Nome;
     double Valor;
@@ -30,7 +39,7 @@ typedef struct Moeda
 }Moeda, *MPointer;
 
 
-void DebugCotacoes(double bitcoin, double ethereum, double ripple);
+void DebugCotacoes(MPointer PCriptos);
 void DebugUser(CPointer pClients, int index);
 void SaveCotacoes(MPointer pCriptos, const char *nomeArquivo);
 void SaveUsers(CPointer pClients, const char *nomeArquivo);
@@ -241,8 +250,8 @@ int main(int argc, char *argv[])
 
 }
 
-void DebugCotacoes(double bitcoin, double ethereum, double ripple){
-    printf("Valores das criptos:\n\n   Bitcoin,  Ethereum,    Ripple;\n%10.2lf,%10.2lf,%10.2lf;\n", bitcoin, ethereum, ripple);
+void DebugCotacoes(MPointer pCriptos){
+    printf("Valores das criptos:\n\n   Bitcoin,  Ethereum,    Ripple;\n%10.2lf,%10.2lf,%10.2lf;\n", pCriptos[0].Valor, pCriptos[1].Valor, pCriptos[2].Valor);
 }
 
 void DebugUser(CPointer pClients, int index){
