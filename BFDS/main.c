@@ -37,6 +37,8 @@ void SaveUsers(Cpointer pClients, char *nomeArquivo);
 int PedirSenha(char userSenha[7]);
 
 
+void SacarReais(Cpointer pClients, int userIndex, char userSenha);
+
 int main(int argc, char *argv[]) 
 {
     setlocale(LC_ALL, "portuguese");
@@ -214,14 +216,14 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        if(respostaUser[0] == "1") ConsultarSaldo();
-        else if(respostaUser[0] == "2") ConsultarExtrato();
-        else if(respostaUser[0] == "3") DepositarReais();
-        else if(respostaUser[0] == "4") SacarReais();
-        else if(respostaUser[0] == "5") ComprarCriptomoedas();
-        else if(respostaUser[0] == "6") VenderCriptomoedas();
-        else if(respostaUser[0] == "7") AtualizarCotacoes();
-        else if(respostaUser[0] == "8") {
+        if(respostaUser[0] == '1') ConsultarSaldo();
+        else if(respostaUser[0] == '2') ConsultarExtrato();
+        else if(respostaUser[0] == '3') DepositarReais();
+        else if(respostaUser[0] == '4') SacarReais(pClients, userIndex, userSenha);
+        else if(respostaUser[0] == '5') ComprarCriptomoedas();
+        else if(respostaUser[0] == '6') VenderCriptomoedas();
+        else if(respostaUser[0] == '7') AtualizarCotacoes();
+        else if(respostaUser[0] == '8') {
             SaveCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor, Cotacoes);
             SaveUsers(pClients, Users);
             break;
@@ -356,7 +358,41 @@ void DepositarReais(){
 
 }
 
-void SacarReais(){
+void SacarReais(Cpointer pClients, int userIndex, char userSenha){
+    system("clear");
+
+    int pedirSenhaSaque = PedirSenha(userSenha);
+    double saque;
+    double saldoCliente = pClients[userIndex].Reais; 
+    if(pedirSenhaSaque == 1){
+
+        printf("Quantos reais gostaria de sacar?: ");
+        scanf(" %lf", &saque);
+        if(saldoCliente < saque){
+            printf("Você não tem saldo suficiente em sua conta para essa operação!");
+            printf("\nPressione Enter para voltar ao menu principal\n");
+            getchar();
+            getchar();
+        }
+        else{
+
+        pClients[userIndex].Reais -= saque;
+
+        printf("R$ $lf sacados à sua conta!", saque);
+        printf("Total Atual: %lf",pClients[userIndex].Reais);
+
+        printf("\nPressione Enter para voltar ao menu principal\n");
+        getchar();
+        getchar();
+        }
+        
+
+    }
+    
+
+
+
+
 
 }
 
