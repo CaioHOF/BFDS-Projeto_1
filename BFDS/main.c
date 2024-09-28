@@ -50,7 +50,7 @@ void ConsultarExtrato();
 
 void DepositarReais(CPointer pClients, int userIndex);
 
-void SacarReais();
+void SacarReais(CPointer pClients, int userIndex, char userSenha[7]);
 
 void ComprarCriptomoedas();
 
@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
         if(respostaUser[0] == '1') ConsultarSaldo(pClients, userIndex);
         else if(respostaUser[0] == '2') ConsultarExtrato();
         else if(respostaUser[0] == '3') DepositarReais(pClients, userIndex);
-        else if(respostaUser[0] == '4') SacarReais();
+        else if(respostaUser[0] == '4') SacarReais(pClients, userIndex, userSenha);
         else if(respostaUser[0] == '5') ComprarCriptomoedas();
         else if(respostaUser[0] == '6') VenderCriptomoedas();
         else if(respostaUser[0] == '7') AtualizarCotacoes();
@@ -373,16 +373,68 @@ void DepositarReais(CPointer pClients, int userIndex){
     printf("Quantos reais gostaria de depositar?: ");
     scanf(" %lf", &deposito);
     
-    pClients[userIndex].Reais += deposito;
+    if(deposito <= 0) { 
+        printf("[ERRO]! Valor inválido.\n O saque deve ser maior que zero.\n");
+        printf("\nPressione Enter para voltar ao menu principal\n");
+        getchar(); 
+        getchar();
+        return;
+    }
 
-    printf("Você depositou R$ %lf\nTotal na conta: R$ %lf",deposito, pClients[userIndex].Reais); 
+
+    pClients[userIndex].Reais += deposito;
+    
+    printf("Você depositou R$ %.2lf\nTotal na conta: R$ %.2lf",deposito, pClients[userIndex].Reais); 
 
     printf("\nPressione Enter para voltar ao menu principal\n");
     getchar();
     getchar();
 
 }
-void SacarReais(){
+void SacarReais(CPointer pClients, int userIndex, char userSenha[7]){
+    limparTerminal();
+
+
+    int pedirSenhaSaque = PedirSenha(userSenha);
+    double saque;
+    
+    if(pedirSenhaSaque == 1){  
+        printf("Quantos reais gostaria de sacar?: ");
+        scanf(" %lf", &saque);
+
+        if(saque <= 0) { 
+            printf("[ERRO]! Valor inválido.\n O saque deve ser maior que zero.\n");
+            printf("\nPressione Enter para voltar ao menu principal\n");
+            getchar(); 
+            getchar();
+            return;
+        }
+
+        if(pClients[userIndex].Reais < saque){  
+            printf("Em sua conta não a saldo suficiente para realizar essa operação!\n");
+            printf("\nPressione Enter para voltar ao menu principal\n");
+            getchar();
+            getchar();
+        }
+        else{
+            pClients[userIndex].Reais = pClients[userIndex].Reais - saque;  
+
+            printf("R$ %.2lf sacados da sua conta!\n", saque);
+            printf("Saldo Atual: R$ %.2lf\n", pClients[userIndex].Reais);
+
+            printf("\nPressione Enter para voltar ao menu principal\n");
+            getchar();
+            getchar();
+        }
+    }
+    else{
+        printf("Senha incorreta! Operação cancelada.\n");
+        printf("\nPressione Enter para voltar ao menu principal\n");
+        getchar();
+        getchar();
+    }
+
+
 
 }
 void ComprarCriptomoedas(){
