@@ -35,7 +35,7 @@ void DebugUser(CPointer pClients, int index);
 void SaveCotacoes(MPointer pCriptos, const char *nomeArquivo);
 void SaveUsers(CPointer pClients, const char *nomeArquivo);
 int PedirSenha(char userSenha[7]);
-void ConsultarSaldo();
+void ConsultarSaldo(CPointer pClients, int userIndex);
 void ConsultarExtrato();
 void DepositarReais();
 void SacarReais();
@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        if(respostaUser[0] == '1') ConsultarSaldo();
+        if(respostaUser[0] == '1') ConsultarSaldo(pClients, userIndex);
         else if(respostaUser[0] == '2') ConsultarExtrato();
         else if(respostaUser[0] == '3') DepositarReais();
         else if(respostaUser[0] == '4') SacarReais();
@@ -329,15 +329,15 @@ int PedirSenha(char userSenhaCerta[7]){
     }
 }
 
-void ConsultarSaldo(Cpointer pClients, int userIndex) {
+void ConsultarSaldo(CPointer pClients, int userIndex) {
     system("clear");
 
     printf("===== Consulta de Saldo =====\n\n");
     printf("Nome: %s\n", pClients[userIndex].Nome);
     printf("Saldo em Reais: R$ %.2lf\n", pClients[userIndex].Reais);
-    printf("Saldo em Bitcoin: %.6lf BTC\n", pClients[userIndex].Bitcoin);
-    printf("Saldo em Ethereum: %.6lf ETH\n", pClients[userIndex].Ethereum);
-    printf("Saldo em Ripple: %.6lf XRP\n", pClients[userIndex].Ripple);
+    printf("Saldo em Bitcoin: %.8lf BTC\n", pClients[userIndex].Bitcoin);
+    printf("Saldo em Ethereum: %.8lf ETH\n", pClients[userIndex].Ethereum);
+    printf("Saldo em Ripple: %.8lf XRP\n", pClients[userIndex].Ripple);
 
     printf("\nPressione Enter para voltar ao menu principal\n");
     getchar();
