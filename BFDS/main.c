@@ -37,7 +37,7 @@ void SaveUsers(Cpointer pClients, char *nomeArquivo);
 int PedirSenha(char userSenha[7]);
 
 
-void SacarReais(Cpointer pClients, int userIndex, char userSenha);
+void SacarReais(Cpointer pClients, int userIndex, char userSenha[7]);
 
 int main(int argc, char *argv[]) 
 {
@@ -358,42 +358,48 @@ void DepositarReais(){
 
 }
 
-void SacarReais(Cpointer pClients, int userIndex, char userSenha){
+void SacarReais(Cpointer pClients, int userIndex, char userSenha[7]){
     system("clear");
 
     int pedirSenhaSaque = PedirSenha(userSenha);
     double saque;
     double saldoCliente = pClients[userIndex].Reais; 
-    if(pedirSenhaSaque == 1){
-
+    
+    if(pedirSenhaSaque == 1){  
         printf("Quantos reais gostaria de sacar?: ");
         scanf(" %lf", &saque);
-        if(saldoCliente < saque){
-            printf("Você não tem saldo suficiente em sua conta para essa operação!");
+
+        if(saque <= 0) { 
+            printf("[ERRO]! Valor inválido.\n O saque deve ser maior que zero.\n");
+            printf("\nPressione Enter para voltar ao menu principal\n");
+            getchar(); 
+            getchar();
+            return;
+        }
+
+        if(saldoCliente < saque){  
+            printf("Em sua conta não a saldo suficiente para realizar essa operação!\n");
             printf("\nPressione Enter para voltar ao menu principal\n");
             getchar();
             getchar();
         }
         else{
+            pClients[userIndex].Reais = pClients[userIndex].Reais - saque;  
 
-        pClients[userIndex].Reais -= saque;
+            printf("R$ %.2lf sacados da sua conta!\n", saque);
+            printf("Saldo Atual: R$ %.2lf\n", pClients[userIndex].Reais);
 
-        printf("R$ $lf sacados à sua conta!", saque);
-        printf("Total Atual: %lf",pClients[userIndex].Reais);
-
+            printf("\nPressione Enter para voltar ao menu principal\n");
+            getchar();
+            getchar();
+        }
+    }
+    else{
+        printf("Senha incorreta! Operação cancelada.\n");
         printf("\nPressione Enter para voltar ao menu principal\n");
         getchar();
         getchar();
-        }
-        
-
     }
-    
-
-
-
-
-
 }
 
 void ComprarCriptomoedas(){
