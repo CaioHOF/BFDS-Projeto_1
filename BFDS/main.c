@@ -4,6 +4,7 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <time.h>
 
 typedef struct Client
 {
@@ -22,7 +23,7 @@ typedef struct Client
 typedef struct Moeda
 {
 
-    char* Nome;
+    char Nome;
     double Valor;
     double TaxaVenda;
     double TaxaCompra;
@@ -41,7 +42,7 @@ void DepositarReais();
 void SacarReais();
 void ComprarCriptomoedas();
 void VenderCriptomoedas();
-void AtualizarCotacoes();
+void AtualizarCotacoes(MPointer pCriptos);
 void limparTerminal();
 
 int main(int argc, char *argv[]) 
@@ -211,7 +212,7 @@ int main(int argc, char *argv[])
         else if(respostaUser[0] == '4') SacarReais();
         else if(respostaUser[0] == '5') ComprarCriptomoedas();
         else if(respostaUser[0] == '6') VenderCriptomoedas();
-        else if(respostaUser[0] == '7') AtualizarCotacoes();
+        else if(respostaUser[0] == '7') AtualizarCotacoes(pCriptos);
         else if(respostaUser[0] == '8') {
             SaveCotacoes(pCriptos, Cotacoes);
             SaveUsers(pClients, Users);
@@ -347,8 +348,46 @@ void ComprarCriptomoedas(){
 void VenderCriptomoedas(){
 
 }
-void AtualizarCotacoes(){
+void AtualizarCotacoes(MPointer pCriptos){
+    srand(time(NULL));
+    int CotacaoBTC, CotacaoETH ,CotacaoXRP;
+    char respostaUser[20];
+    
+    limparTerminal();
+    
+    while (true){
+        printf("A cotação das moedas é: %.2lf Reais/Bitcoin, %.2lf Reais/Ethereum, %.2lf Reais/Ripple.\n", pCriptos[0].Valor, pCriptos[1].Valor, pCriptos[2].Valor);
+        printf("Deseja atualizar? (s/n) \n");
+        scanf("%s", respostaUser);
+        if (respostaUser[0] == 's'){
+            printf("Processando novos valores...\n");
+            sleep(4);
 
+            int CotacaoBTC = (rand() % 11) - 5;
+            int CotacaoETH = (rand() % 11) - 5;
+            int CotacaoXRP = (rand() % 11) - 5;
+
+            pCriptos[0].Valor = pCriptos[0].Valor +(CotacaoBTC*pCriptos[0].Valor *0.01);
+            pCriptos[1].Valor = pCriptos[1].Valor +(CotacaoETH*pCriptos[1].Valor *0.01);
+            pCriptos[2].Valor = pCriptos[2].Valor +(CotacaoXRP*pCriptos[2].Valor *0.01);
+
+            printf("A nova cotação das moedas é: %.2lf Reais/Bitcoin, %.2lf Reais/Ethereum, %.2lf Reais/Ripple.\n", pCriptos[0].Valor, pCriptos[1].Valor, pCriptos[2].Valor);
+            printf("Aperte enter para voltar ao menu principal.\n");
+            getchar();
+            getchar();
+            return;
+        }
+        else if (respostaUser[0] == 'n'){
+            printf("Aperte enter para voltar ao menu principal.\n");
+            getchar();
+            getchar();
+            return;
+        }
+        else{
+            printf("Resposta inválida! Tente novamente.\n");
+        }
+    }
+    limparTerminal();
 }
 
 void limparTerminal() {
