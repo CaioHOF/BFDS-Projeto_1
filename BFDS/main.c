@@ -42,7 +42,7 @@ void SacarReais();
 void ComprarCriptomoedas();
 void VenderCriptomoedas();
 void AtualizarCotacoes();
-
+void limparTerminal();
 
 int main(int argc, char *argv[]) 
 {
@@ -349,4 +349,8 @@ void VenderCriptomoedas(){
 }
 void AtualizarCotacoes(){
 
+}
+
+void limparTerminal() {
+    printf("\033[H\033[J");
 }
