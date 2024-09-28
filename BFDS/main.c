@@ -17,41 +17,39 @@ typedef struct Client
     double Ethereum;
     double Ripple;
 
-}Client, *Cpointer;
+}Client, *CPointer;
 
-typedef struct Moeda Moeda;
-struct Moeda
+typedef struct Moeda
 {
 
+    char* Nome;
     double Valor;
     double TaxaVenda;
     double TaxaCompra;
 
-};
+}Moeda, *MPointer;
 
 //Funções de Sistema
 void DebugCotacoes(double bitcoin, double ethereum, double ripple);
-void DebugUser(Cpointer pClients, int index);
-void SaveCotacoes(double bitcoin, double ethereum, double ripple, char *nomeArquivo);
-void SaveUsers(Cpointer pClients, char *nomeArquivo);
+void DebugUser(CPointer pClients, int index);
+void SaveCotacoes(MPointer pCriptos, const char *nomeArquivo);
+void SaveUsers(CPointer pClients, const char *nomeArquivo);
 int PedirSenha(char userSenha[7]);
-
-//Funções para usuarios
-void ConsultarSaldo(Cpointer pClients, int userIndex);
+void ConsultarSaldo();
 void ConsultarExtrato();
 void DepositarReais();
 void SacarReais();
 void ComprarCriptomoedas();
 void VenderCriptomoedas();
 void AtualizarCotacoes();
-
+void limparTerminal();
 
 int main(int argc, char *argv[]) 
 {
     setlocale(LC_ALL, "portuguese");
     
     FILE *pTxtCotacoes, *pTxtUsers;
-    const char *Cotacoes = "Cotacoes.txt", *Users = "Users.txt";
+    const char *Cotacoes = "Cotacoes.bin", *Users = "Users.bin";
 
     char userCpf[12] = "";
     char userSenha[7] = "";
@@ -63,39 +61,23 @@ int main(int argc, char *argv[])
     int i;
     int index;
     int quantDadosPegosDoSscanf;
-	
-    Moeda bitcoin;
-    Moeda ethereum;
-    Moeda ripple;
-    
-    bitcoin.TaxaCompra = 0.02;
-    bitcoin.TaxaVenda = 0.03;
-    ethereum.TaxaCompra = 0.01;
-    ethereum.TaxaVenda = 0.02;
-    ripple.TaxaCompra = 0.01;
-    ripple.TaxaVenda = 0.01;
 
-    Cpointer pClients;
-    pClients = (Cpointer)calloc(10, sizeof(Client));
+    CPointer pClients;
+    pClients = (CPointer)calloc(10, sizeof(Client));
 
-    pTxtCotacoes = fopen(Cotacoes, "r");
+    MPointer pCriptos;
+    pCriptos = (MPointer)calloc(3, sizeof(Moeda));
+
+
+    pTxtCotacoes = fopen(Cotacoes, "rb");
     if(pTxtCotacoes == NULL) return 2;
-    fgets(leitor, sizeof(leitor), pTxtCotacoes);
-    fgets(leitor, sizeof(leitor), pTxtCotacoes);
-    quantDadosPegosDoSscanf = sscanf(leitor, "%lf,%lf,%lf", &bitcoin.Valor, &ethereum.Valor, &ripple.Valor);
+    fread(pCriptos, sizeof(Moeda), 3, pTxtCotacoes);
     fclose(pTxtCotacoes);
-    //DebugCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor);//debug
+    //DebugCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor);//debug*/
     
-    pTxtUsers = fopen(Users, "r");
+    pTxtUsers = fopen(Users, "rb");
     if(pTxtUsers == NULL) return 3;
-    index = 0;
-    fgets(leitor, sizeof(leitor), pTxtUsers);
-    while (fgets(leitor, sizeof(leitor), pTxtUsers)){
-        //printf("\nleitor:\n%s", leitor);//debug
-        quantDadosPegosDoSscanf = sscanf(leitor,"%[^,],%[^,],%[^,],%lf,%lf,%lf,%lf", pClients[index].Nome, pClients[index].Cpf, pClients[index].Senha, &pClients[index].Reais, &pClients[index].Bitcoin, &pClients[index].Ethereum, &pClients[index].Ripple);
-        //printf("quantDadosPegosDoSscanf: %d\n\n", quantDadosPegosDoSscanf);//debug
-        index++;
-    }
+    fread(pClients, sizeof(Client), 10, pTxtUsers);
     fclose(pTxtUsers);
 
     //login
@@ -223,7 +205,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        if(respostaUser[0] == '1') ConsultarSaldo(pClients, userIndex);
+        if(respostaUser[0] == '1') ConsultarSaldo();
         else if(respostaUser[0] == '2') ConsultarExtrato();
         else if(respostaUser[0] == '3') DepositarReais();
         else if(respostaUser[0] == '4') SacarReais();
@@ -231,7 +213,7 @@ int main(int argc, char *argv[])
         else if(respostaUser[0] == '6') VenderCriptomoedas();
         else if(respostaUser[0] == '7') AtualizarCotacoes();
         else if(respostaUser[0] == '8') {
-            SaveCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor, Cotacoes);
+            SaveCotacoes(pCriptos, Cotacoes);
             SaveUsers(pClients, Users);
             break;
         }
@@ -248,7 +230,7 @@ int main(int argc, char *argv[])
             printf("!\n");
             continue;
         }
-        SaveCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor, Cotacoes);
+        SaveCotacoes(pCriptos, Cotacoes);
         SaveUsers(pClients, Users);
     }
 
@@ -263,7 +245,7 @@ void DebugCotacoes(double bitcoin, double ethereum, double ripple){
     printf("Valores das criptos:\n\n   Bitcoin,  Ethereum,    Ripple;\n%10.2lf,%10.2lf,%10.2lf;\n", bitcoin, ethereum, ripple);
 }
 
-void DebugUser(Cpointer pClients, int index){
+void DebugUser(CPointer pClients, int index){
     //-1 ira mostrar a tabela inteira
     if(index == -1){
         int i;
@@ -279,32 +261,26 @@ void DebugUser(Cpointer pClients, int index){
     }
 }
 
-void SaveCotacoes(double bitcoin, double ethereum, double ripple, char *nomeArquivo){
+void SaveCotacoes(MPointer pMoeda, const char* nomeArquivo){
     FILE* destino;
-    destino = fopen(nomeArquivo, "w");
+    destino = fopen(nomeArquivo, "wb");
     if(destino == NULL){
         perror("falha ao abrir o arquivo destino no \"SaveCotacoes\"");
     }
     else{
-        fprintf(destino,"Bitcoin,Ethereum,Ripple\n");
-        fprintf(destino,"%.2lf,%.2lf,%.2lf\n", bitcoin, ethereum, ripple);
+        fwrite(pMoeda, sizeof(Moeda), 3, destino);
         fclose(destino);
     }
 }
 
-void SaveUsers(Cpointer pClients, char *nomeArquivo){
+void SaveUsers(CPointer pClients, const char *nomeArquivo){
     FILE* destino;
-    destino = fopen(nomeArquivo, "w");
+    destino = fopen(nomeArquivo, "wb");
     if(destino == NULL){
         perror("falha ao abrir o arquivo destino no \"SaveUsers\"");
     }
     else{
-        fprintf(destino,"Nome,Cpf,Senha,Reais,Bitcoin,Ethereum,Ripple\n");
-        int c;
-        for (c = 0; c < 10; c++)
-        {
-            fprintf(destino, "%s,%s,%s,%.2lf,%.2lf,%.2lf,%.2lf\n", pClients[c].Nome, pClients[c].Cpf, pClients[c].Senha, pClients[c].Reais, pClients[c].Bitcoin, pClients[c].Ethereum, pClients[c].Ripple);
-        }
+        fwrite(pClients, sizeof(Client), 10, destino);
         fclose(destino);
     }
 }
@@ -367,27 +343,25 @@ void ConsultarSaldo(Cpointer pClients, int userIndex) {
     getchar();
     getchar();
 }
-
 void ConsultarExtrato(){
 
 }
-
 void DepositarReais(){
 
 }
-
 void SacarReais(){
 
 }
-
 void ComprarCriptomoedas(){
 
 }
-
 void VenderCriptomoedas(){
 
 }
-
 void AtualizarCotacoes(){
 
+}
+
+void limparTerminal() {
+    printf("\033[H\033[J");
 }
