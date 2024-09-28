@@ -48,7 +48,7 @@ void ConsultarSaldo(CPointer pClients, int userIndex);
 
 void ConsultarExtrato();
 
-void DepositarReais();
+void DepositarReais(CPointer pClients, int userIndex);
 
 void SacarReais();
 
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
 
         if(respostaUser[0] == '1') ConsultarSaldo(pClients, userIndex);
         else if(respostaUser[0] == '2') ConsultarExtrato();
-        else if(respostaUser[0] == '3') DepositarReais();
+        else if(respostaUser[0] == '3') DepositarReais(pClients, userIndex);
         else if(respostaUser[0] == '4') SacarReais();
         else if(respostaUser[0] == '5') ComprarCriptomoedas();
         else if(respostaUser[0] == '6') VenderCriptomoedas();
@@ -365,7 +365,21 @@ void ConsultarSaldo(CPointer pClients, int userIndex){
 void ConsultarExtrato(){
 
 }
-void DepositarReais(){
+void DepositarReais(CPointer pClients, int userIndex){
+
+    limparTerminal();
+
+    double deposito;
+    printf("Quantos reais gostaria de depositar?: ");
+    scanf(" %lf", &deposito);
+    
+    pClients[userIndex].Reais += deposito;
+
+    printf("Você depositou R$ %lf\nTotal na conta: R$ %lf",deposito, pClients[userIndex].Reais); 
+
+    printf("\nPressione Enter para voltar ao menu principal\n");
+    getchar();
+    getchar();
 
 }
 void SacarReais(){
