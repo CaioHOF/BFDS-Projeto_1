@@ -29,20 +29,35 @@ typedef struct Moeda
 
 }Moeda, *MPointer;
 
-
+//Funções de Sistema
 void DebugCotacoes(double bitcoin, double ethereum, double ripple);
+
 void DebugUser(CPointer pClients, int index);
+
 void SaveCotacoes(MPointer pCriptos, const char *nomeArquivo);
+
 void SaveUsers(CPointer pClients, const char *nomeArquivo);
-int PedirSenha(char userSenha[7]);
-void ConsultarSaldo();
-void ConsultarExtrato();
-void DepositarReais();
-void SacarReais();
-void ComprarCriptomoedas();
-void VenderCriptomoedas();
-void AtualizarCotacoes();
+
 void limparTerminal();
+
+
+//Funções do usuario
+int PedirSenha(char userSenha[7]);
+
+void ConsultarSaldo(CPointer pClients, int userIndex);
+
+void ConsultarExtrato();
+
+void DepositarReais();
+
+void SacarReais();
+
+void ComprarCriptomoedas();
+
+void VenderCriptomoedas();
+
+void AtualizarCotacoes();
+
 
 int main(int argc, char *argv[]) 
 {
@@ -184,7 +199,7 @@ int main(int argc, char *argv[])
     }
     //menu
     while(true){
-        system("clear");
+        limparTerminal();
         printf("Bem vindo %s!!\n\n", pClients[userIndex].Nome);
         sleep(2);
         printf("     _-+={Menu}=+-_     \n\n");
@@ -205,7 +220,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        if(respostaUser[0] == '1') ConsultarSaldo();
+        if(respostaUser[0] == '1') ConsultarSaldo(pClients, userIndex);
         else if(respostaUser[0] == '2') ConsultarExtrato();
         else if(respostaUser[0] == '3') DepositarReais();
         else if(respostaUser[0] == '4') SacarReais();
@@ -215,7 +230,7 @@ int main(int argc, char *argv[])
         else if(respostaUser[0] == '8') {
             SaveCotacoes(pCriptos, Cotacoes);
             SaveUsers(pClients, Users);
-            break;
+            return 0;
         }
         else{
             for(i = 0; i < 4; i++){
@@ -329,7 +344,22 @@ int PedirSenha(char userSenhaCerta[7]){
     }
 }
 
-void ConsultarSaldo(){
+void ConsultarSaldo(CPointer pClients, int userIndex){
+
+    limparTerminal();
+
+    printf("===== Consulta de Saldo =====\n\n");
+    printf("Nome: %s\n", pClients[userIndex].Nome);
+    printf("Saldo em Reais: R$ %.2lf\n", pClients[userIndex].Reais);
+    printf("Saldo em Bitcoin: %.8lf BTC\n", pClients[userIndex].Bitcoin);
+    printf("Saldo em Ethereum: %.8lf ETH\n", pClients[userIndex].Ethereum);
+    printf("Saldo em Ripple: %.8lf XRP\n", pClients[userIndex].Ripple);
+
+    printf("\nPressione Enter para voltar ao menu principal\n");
+    getchar();
+    getchar();
+
+
 
 }
 void ConsultarExtrato(){
