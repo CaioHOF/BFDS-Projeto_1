@@ -39,10 +39,10 @@ void ConsultarSaldo();
 void ConsultarExtrato();
 void DepositarReais();
 void SacarReais();
-void ComprarCriptomoedas();
+void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple);
 void VenderCriptomoedas();
 void AtualizarCotacoes();
-
+void limparTerminal();
 
 int main(int argc, char *argv[]) 
 {
@@ -79,6 +79,9 @@ int main(int argc, char *argv[])
     if(pTxtUsers == NULL) return 3;
     fread(pClients, sizeof(Client), 10, pTxtUsers);
     fclose(pTxtUsers);
+
+    DebugUser(pClients, -1);
+
 
     //login
     bool usuarioEncontrado, cpfIgual;
@@ -209,7 +212,7 @@ int main(int argc, char *argv[])
         else if(respostaUser[0] == '2') ConsultarExtrato();
         else if(respostaUser[0] == '3') DepositarReais();
         else if(respostaUser[0] == '4') SacarReais();
-        else if(respostaUser[0] == '5') ComprarCriptomoedas();
+        else if(respostaUser[0] == '5') ComprarCriptomoedas(pClients, userIndex, &pCriptos[0], &pCriptos[1], &pCriptos[2]);
         else if(respostaUser[0] == '6') VenderCriptomoedas();
         else if(respostaUser[0] == '7') AtualizarCotacoes();
         else if(respostaUser[0] == '8') {
@@ -341,7 +344,84 @@ void DepositarReais(){
 void SacarReais(){
 
 }
-void ComprarCriptomoedas(){
+void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple){
+    char respostaUser[20];
+    double valorCompra, valorFinal;
+    double taxa, valorConvertido;
+    int opcaoMoeda;
+
+    limparTerminal();
+
+    printf("Qual criptomoeda deseja comprar?!\n");
+    printf("1 - Bitcoin\n");
+    printf("2 - Ethereum\n");
+    printf("3 - Ripple\n");
+    scanf("%d", &opcaoMoeda);
+
+    limparTerminal();
+
+    printf("Digite o valor que você deseja investir (em reais):\n");
+    scanf("%lf", &valorCompra);
+
+    limparTerminal();
+
+    if (valorCompra > pClients[userIndex].Reais) {
+        printf("Saldo insuficiente para realizar a operação!.\n");
+        printf("\nPressione Enter para voltar ao menu principal\n");
+        getchar();
+        getchar();
+        return;
+    }
+
+    switch(opcaoMoeda) {
+    case 1: 
+        taxa = valorCompra * bitcoin->TaxaCompra;  
+        valorConvertido = (valorCompra - taxa) / bitcoin->Valor;  
+        printf("Com o valor investido você comprará %.10lf Bitcoins, com uma taxa de R$%.2lf\nO total da transação será de R$%.2lf.\nConfirmar? (s/n)\n", valorConvertido, taxa, (valorCompra+taxa));
+        break;
+    case 2: 
+        taxa = valorCompra * ethereum->TaxaCompra;  
+        valorConvertido = (valorCompra - taxa) / ethereum->Valor;  
+        printf("Com o valor investido você comprará %.10lf Ethereums, com uma taxa de R$%.2lf\nO total da transação será de R$%.2lf.\nConfirmar? (s/n)\n", valorConvertido, taxa, (valorCompra+taxa));
+        break;
+    case 3: 
+        taxa = valorCompra * ripple->TaxaCompra;  
+        valorConvertido = (valorCompra - taxa) / ripple->Valor;  
+        printf("Com o valor investido você comprará %.10lf Ripples, com uma taxa de R$%.2lf\nO total da transação será de R$%.2lf.\nConfirmar? (s/n)\n", valorConvertido, taxa, (valorCompra+taxa));
+        break;
+    default:
+        printf("Opção inválida.\n");
+        printf("\nPressione Enter para voltar ao menu principal\n");
+        return;
+    }
+
+    
+    scanf(" %s", respostaUser);
+    if (respostaUser[0] == 's') {
+        pClients[userIndex].Reais -= (valorCompra + taxa); 
+        switch(opcaoMoeda) {
+            case 1:
+                pClients[userIndex].Bitcoin += valorConvertido;
+                break;
+            case 2:
+                pClients[userIndex].Ethereum += valorConvertido;
+                break;
+            case 3:
+                pClients[userIndex].Ripple += valorConvertido;
+                break;
+        }
+        limparTerminal();
+        printf("Compra realizada com sucesso!\n");
+        printf("\nPressione Enter para voltar ao menu principal\n");
+        getchar();
+        getchar();
+    } else {
+        limparTerminal();
+        printf("Compra cancelada!\n");
+        printf("\nPressione Enter para voltar ao menu principal\n");
+        getchar();
+        getchar();
+    }
 
 }
 void VenderCriptomoedas(){
@@ -349,4 +429,8 @@ void VenderCriptomoedas(){
 }
 void AtualizarCotacoes(){
 
+}
+
+void limparTerminal() {
+    printf("\033[H\033[J");
 }
