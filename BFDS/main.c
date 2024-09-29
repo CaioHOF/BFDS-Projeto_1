@@ -9,11 +9,13 @@ typedef struct Extrato{
     
     char Usuario[21];
     char cpf[12];
-    char* TipoMoeda;
+    char TipoMoeda[11];
     char TipoTransacao;
-    int IndiceAtual;
-
-}Extrato, *EPointer;
+    //+ ou -
+    double Quantidade;
+    double ValorDaMoedaNaTroca;
+    
+}Extrato, **EPointer;
 
 
 typedef struct Client{
@@ -22,6 +24,8 @@ typedef struct Client{
     char Cpf[12];
     char Senha[7];
 
+    int ExtratoIndice;
+    //isso daqui não é pra mexer é só da função de extrato
     double Reais;
     double Bitcoin;
     double Ethereum;
@@ -31,7 +35,7 @@ typedef struct Client{
 
 typedef struct Moeda{
 
-    char* Nome;
+    char Nome[11];
     double Valor;
     double TaxaVenda;
     double TaxaCompra;
@@ -43,9 +47,11 @@ void DebugCotacoes(MPointer PCriptos);
 void DebugUser(CPointer pClients, int index);
 void SaveCotacoes(MPointer pCriptos, const char *nomeArquivo);
 void SaveUsers(CPointer pClients, const char *nomeArquivo);
+void SaveExtrato(EPointer ppExtrato, char *nomeArquivo);
 int PedirSenha(char userSenha[7]);
 void ConsultarSaldo();
 void ConsultarExtrato();
+bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CPointer pClients, int userIndex, char TipoTransação, double quantidade);
 void DepositarReais();
 void SacarReais();
 void ComprarCriptomoedas();
@@ -57,8 +63,9 @@ int main(int argc, char *argv[])
 {
     setlocale(LC_ALL, "portuguese");
     
-    FILE *pTxtCotacoes, *pTxtUsers;
-    const char *Cotacoes = "Cotacoes.bin", *Users = "Users.bin";
+    FILE *pTxtCotacoes, *pTxtUsers, *pTxtExtrato;
+    const char *Cotacoes = "Cotacoes.bin", *Users = "Users.bin", *Extratos = "Extrato.bin";
+
 
     char userCpf[12] = "";
     char userSenha[7] = "";
@@ -73,10 +80,19 @@ int main(int argc, char *argv[])
 
     CPointer pClients;
     pClients = (CPointer)calloc(10, sizeof(Client));
-
+    if(pClients == NULL) return 1;
+    
     MPointer pCriptos;
     pCriptos = (MPointer)calloc(3, sizeof(Moeda));
+    if(pCriptos == NULL) return 1;
 
+
+    EPointer ppExtrato;
+    ppExtrato = (EPointer)calloc(10, sizeof(Extrato *));
+    if(ppExtrato == NULL) return 1;
+    for( index = 0; index < 10; i++){
+        ppExtrato[index] = (Extrato *)calloc(100, sizeof(Extrato));
+    }
 
     pTxtCotacoes = fopen(Cotacoes, "rb");
     if(pTxtCotacoes == NULL) return 2;
@@ -85,9 +101,25 @@ int main(int argc, char *argv[])
     //DebugCotacoes(bitcoin.Valor, ethereum.Valor, ripple.Valor);//debug*/
     
     pTxtUsers = fopen(Users, "rb");
-    if(pTxtUsers == NULL) return 3;
+    if(pTxtUsers == NULL) return 2;
     fread(pClients, sizeof(Client), 10, pTxtUsers);
     fclose(pTxtUsers);
+
+    //teste
+    SaveExtrato(ppExtrato, Extratos);
+    
+    pTxtExtrato = fopen(Extratos, "rb");
+    if(pTxtExtrato == NULL) return 3;
+    for (i = 0; i < 10; i++)
+    {
+        fread(ppExtrato[i], sizeof(Extrato), 100, pTxtExtrato);
+    }
+    fclose(pTxtExtrato);
+
+    //teste de Adicionar Extrato
+    AdicionarExtrato(ppExtrato, pCriptos, "Reais", pClients, userIndex, "D", 10);
+    DebugExtrato(ppExtrato, -1);
+    system("pause");
 
     //login
     bool usuarioEncontrado, cpfIgual;
@@ -241,11 +273,17 @@ int main(int argc, char *argv[])
         }
         SaveCotacoes(pCriptos, Cotacoes);
         SaveUsers(pClients, Users);
+        SaveExtrato(ppExtrato, Extratos);
     }
 
 
     system("pause");
     free(pClients);
+    free(pCriptos);
+    for(i = 0; i < 10; i++){
+        free(ppExtrato[i]);
+    }
+    free(ppExtrato);
 	return 0;
 
 }
@@ -259,14 +297,37 @@ void DebugUser(CPointer pClients, int index){
     if(index == -1){
         int i;
         for(i = 0; i < 10; i++){
-            printf("| nome: |%20s| |,| Cpf: |%11s| |,| Senha: |%6s| |,| Reais: |%.2lf| |,| Bitcoin: |%.2lf| |,| Ethereum: |%.2lf| |,| Ripple: |%.2lf| |;\n", pClients[i].Nome, pClients[i].Cpf, pClients[i].Senha, pClients[i].Reais, pClients[i].Bitcoin, pClients[i].Ethereum, pClients[i].Ripple);
+            printf("| nome: |%20s| |,| Cpf: |%11s| |,| Senha: |%6s| |,| Reais: |%15.2lf| |,| Bitcoin: |%15.2lf| |,| Ethereum: |%15.2lf| |,| Ripple: |%15.2lf| |;\n", pClients[i].Nome, pClients[i].Cpf, pClients[i].Senha, pClients[i].Reais, pClients[i].Bitcoin, pClients[i].Ethereum, pClients[i].Ripple);
         }
     }
-    else if(index < 9 && index > -1){
-        printf("| nome: |%20s| |,| Cpf: |%11s| |,| Senha: |%6s| |,| Reais: |%.2lf| |,| Bitcoin: |%.2lf| |,| Ethereum: |%.2lf| |,| Ripple: |%.2lf| |;\n\n", pClients[index].Nome, pClients[index].Cpf, pClients[index].Senha, pClients[index].Reais, pClients[index].Bitcoin, pClients[index].Ethereum, pClients[index].Ripple);
+    else if(index < 10 && index > -1){
+        printf("| nome: |%20s| |,| Cpf: |%11s| |,| Senha: |%6s| |,| Reais: |%15.2lf| |,| Bitcoin: |%15.2lf| |,| Ethereum: |%15.2lf| |,| Ripple: |%15.2lf| |;\n\n", pClients[index].Nome, pClients[index].Cpf, pClients[index].Senha, pClients[index].Reais, pClients[index].Bitcoin, pClients[index].Ethereum, pClients[index].Ripple);
     }
     else{
-        printf("index inválido");
+        perror("index fornecido para \'DebugUser\' inválido");
+    }
+}
+
+void DebugExtrato(EPointer ppExtrato, int index){
+    int i,j;
+    if(index == -1){
+        printf("Porque Fez isso?????!!\n");
+        sleep(2);
+        for(i = 0; i < 10; i++){
+            for (j = 0; j < 100; j++)
+            {
+                printf("| Usuario: |%20s| |,| Cpf: |%11s| |,| TipoMoeda: |%10s| |,| TipoTransacao: |%c| |,| Quantidade: |%15.2lf| |,| ValorDaMoedaNaTroca: |%15.2lf|;\n", ppExtrato[i][j].Usuario, ppExtrato[i][j].cpf, ppExtrato[i][j].TipoMoeda, ppExtrato[i][j].TipoTransacao, ppExtrato[i][j].Quantidade, ppExtrato[i][j].ValorDaMoedaNaTroca);
+            }
+            printf("\n\n");
+        }
+    }
+    else if(index > -1 && index < 10){
+            for(j = 0; j < 100; j++){
+                printf("| Usuario: |%20s| |,| Cpf: |%11s| |,| TipoMoeda: |%10s| |,| TipoTransacao: |%c| |,| Quantidade: |%15.2lf| |,| ValorDaMoedaNaTroca: |%15.2lf|;\n", ppExtrato[index][j].Usuario, ppExtrato[index][j].cpf, ppExtrato[index][j].TipoMoeda, ppExtrato[index][j].TipoTransacao, ppExtrato[index][j].Quantidade, ppExtrato[index][j].ValorDaMoedaNaTroca);
+            }
+    }
+    else{
+        perror("index fornecido para \'DebugExtrato\' inválido");
     }
 }
 
@@ -290,6 +351,21 @@ void SaveUsers(CPointer pClients, const char *nomeArquivo){
     }
     else{
         fwrite(pClients, sizeof(Client), 10, destino);
+        fclose(destino);
+    }
+}
+
+void SaveExtrato(EPointer ppExtrato, char *nomeArquivo){
+    int i;
+    FILE* destino;
+    destino = fopen(nomeArquivo, "wb");
+    if(destino == NULL){
+        perror("falha ao abrir o arquivo destino no \"SaveExtrato\"");
+    }
+    else{
+        for(i = 0; i < 10; i++){
+            fwrite(ppExtrato[i], sizeof(Extrato), 100, destino);
+        }
         fclose(destino);
     }
 }
@@ -341,21 +417,66 @@ int PedirSenha(char userSenhaCerta[7]){
 void ConsultarSaldo(){
 
 }
+
+bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CPointer pClients, int userIndex, char TipoTransação, double quantidade){
+    //TipoTransação pode ser D de deposito, + quando o usuario ganhar a respectiva "double quantidade", e - quando perder.
+    int criptoIndex = -1, i;
+    bool achou = false;
+    if (strcmp(nomeMoeda, "Reais") != 0)
+    {
+        for (i = 0; i < 3; i++)
+        {
+            if(strcmp(pCriptos[i].Nome, nomeMoeda) == 0){
+                achou = true;
+                criptoIndex = i;
+                break;
+            }
+        }
+        if(!achou){
+            perror("\'nomeMoeda\'escrito, na função \'AdicionarExtrato\', não encontrado");
+            return false;
+        }
+    }
+    
+    strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].Usuario, pClients[userIndex].Nome);
+    strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].cpf, pClients[userIndex].Cpf);
+    ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TipoTransacao = TipoTransação;
+
+    if(criptoIndex != -1){
+        strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TipoMoeda, pClients[userIndex].Nome);
+        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].ValorDaMoedaNaTroca = pCriptos[criptoIndex].Valor;
+    }
+    else{
+        strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TipoMoeda, nomeMoeda);
+        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].ValorDaMoedaNaTroca = 1;
+    }
+
+    ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].Quantidade = quantidade;
+
+    pClients[userIndex].ExtratoIndice++;
+    return true;
+}
+
 void ConsultarExtrato(){
 
 }
+
 void DepositarReais(){
 
 }
+
 void SacarReais(){
 
 }
+
 void ComprarCriptomoedas(){
 
 }
+
 void VenderCriptomoedas(){
 
 }
+
 void AtualizarCotacoes(){
 
 }
