@@ -117,110 +117,6 @@ int main(int argc, char *argv[])
     }
     fclose(pTxtExtrato);
     
-    pCriptos[0].Valor = 50.0;
-    pCriptos[0].TaxaCompra = 0.02;
-    pCriptos[0].TaxaVenda = 0.03;
-    pCriptos[1].Valor = 1.0;
-    pCriptos[1].TaxaCompra = 0.01;
-    pCriptos[1].TaxaVenda = 0.02;
-    pCriptos[2].Valor = 300.0;
-    pCriptos[2].TaxaCompra = 0.01;
-    pCriptos[2].TaxaVenda = 0.01;
-
-    strcpy(pClients[1].Nome, "");
-    strcpy(pClients[1].Cpf, "00000000022");
-    strcpy(pClients[1].Senha, "000002");
-    pClients[1].ExtratoIndice = 0;
-    pClients[1].Reais = 0;
-    pClients[1].Bitcoin = 0;
-    pClients[1].Ethereum = 0;
-    pClients[1].Ripple = 0;
-
-    strcpy(pClients[2].Nome, "");
-    strcpy(pClients[2].Cpf, "00000000033");
-    strcpy(pClients[2].Senha, "000003");
-    pClients[2].ExtratoIndice = 0;
-    pClients[2].Reais = 0;
-    pClients[2].Bitcoin = 0;
-    pClients[2].Ethereum = 0;
-    pClients[2].Ripple = 0;
-
-    strcpy(pClients[3].Nome, "");
-    strcpy(pClients[3].Cpf, "00000000044");
-    strcpy(pClients[3].Senha, "000004");
-    pClients[3].ExtratoIndice = 0;
-    pClients[3].Reais = 0;
-    pClients[3].Bitcoin = 0;
-    pClients[3].Ethereum = 0;
-    pClients[3].Ripple = 0;
-
-    strcpy(pClients[4].Nome, "");
-    strcpy(pClients[4].Cpf, "00000000055");
-    strcpy(pClients[4].Senha, "000005");
-    pClients[4].ExtratoIndice = 0;
-    pClients[4].Reais = 0;
-    pClients[4].Bitcoin = 0;
-    pClients[4].Ethereum = 0;
-    pClients[4].Ripple = 0;
-
-    strcpy(pClients[5].Nome, "");
-    strcpy(pClients[5].Cpf, "00000000066");
-    strcpy(pClients[5].Senha, "000006");
-    pClients[5].ExtratoIndice = 0;
-    pClients[5].Reais = 0;
-    pClients[5].Bitcoin = 0;
-    pClients[5].Ethereum = 0;
-    pClients[5].Ripple = 0;
-
-    strcpy(pClients[6].Nome, "");
-    strcpy(pClients[6].Cpf, "00000000077");
-    strcpy(pClients[6].Senha, "000007");
-    pClients[6].ExtratoIndice = 0;
-    pClients[6].Reais = 0;
-    pClients[6].Bitcoin = 0;
-    pClients[6].Ethereum = 0;
-    pClients[6].Ripple = 0;
-
-    strcpy(pClients[7].Nome, "");
-    strcpy(pClients[7].Cpf, "00000000088");
-    strcpy(pClients[7].Senha, "000008");
-    pClients[7].ExtratoIndice = 0;
-    pClients[7].Reais = 0;
-    pClients[7].Bitcoin = 0;
-    pClients[7].Ethereum = 0;
-    pClients[7].Ripple = 0;
-    
-    strcpy(pClients[8].Nome, "");
-    strcpy(pClients[8].Cpf, "00000000099");
-    strcpy(pClients[8].Senha, "000009");
-    pClients[8].ExtratoIndice = 0;
-    pClients[8].Reais = 0;
-    pClients[8].Bitcoin = 0;
-    pClients[8].Ethereum = 0;
-    pClients[8].Ripple = 0;
-
-    strcpy(pClients[9].Nome, "");
-    strcpy(pClients[9].Cpf, "00000000100");
-    strcpy(pClients[9].Senha, "000010");
-    pClients[9].ExtratoIndice = 0;
-    pClients[9].Reais = 0;
-    pClients[9].Bitcoin = 0;
-    pClients[9].Ethereum = 0;
-    pClients[9].Ripple = 0;
-
-    DebugUser(pClients, -1);
-    printf("\n\n\n");
-    DebugCotacoes(pCriptos, -1);
-    printf("\n\n\n");
-    printf("Pressione Enter para continuar...");
-    getchar();
-    getchar();
-    getchar();
-    
-    SaveCotacoes(pCriptos, Cotacoes);
-    SaveUsers(pClients, Users);
-
-    
     //login
     bool usuarioEncontrado, cpfIgual;
     while (true){
@@ -534,8 +430,8 @@ bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CP
     //EPointer, Mpointer, Cpointer são os ponteiros das struct que estamos usando;
     //NomeMoeda é qual moeda ta sendo usada na transação, garanta que ele foi escrito corretamente, caso o contrario o programa ira falar "'nomeMoeda'escrito, na função 'AdicionarExtrato', não encontrado";
     //userIndex é o index do user é uma variavel da main que é pega na função login;
-    //TipoTransação é um char que tem que ser escrito com aspas simples ou seja ' '. Ele pode ser D de deposito, + quando o usuario ganhar a respectiva "double quantidade", e - quando perder;
-    //quantidade é a quantidade que o user esta movimentando na transação;
+    //TipoTransação é um char que tem que ser escrito com aspas simples ou seja ' '. Ele pode ser D de deposito, S de saque, V de venda ou C de compra;
+    //quantidade é a quantidade que o user esta movimentando na transação(usar apenas valores absolutos ou seja nao podem ser negativos, o tipo da operação é definido por outra variavel);
     int criptoIndex = -1, i, num;
     bool achou = false;
     if (strcmp(nomeMoeda, "Reais") != 0)
