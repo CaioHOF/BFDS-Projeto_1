@@ -925,14 +925,10 @@ void AtualizarCotacoes(MPointer pCriptos){
             pCriptos[2].Valor = pCriptos[2].Valor +(CotacaoXRP*pCriptos[2].Valor *0.01);
 
             printf("A nova cotação das moedas é: %.2lf Reais/Bitcoin, %.2lf Reais/Ethereum, %.2lf Reais/Ripple.\n", pCriptos[0].Valor, pCriptos[1].Valor, pCriptos[2].Valor);
-            printf("Aperte enter para voltar ao menu principal.\n");
-            getchar();
             getchar();
             return;
         }
         else if (respostaUser[0] == 'n'){
-            printf("Aperte enter para voltar ao menu principal.\n");
-            getchar();
             getchar();
             return;
         }
