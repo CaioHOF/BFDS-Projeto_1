@@ -65,17 +65,17 @@ int PedirSenha(char userSenha[7]);
 void limparTerminal();
 
 //Funções do Usuario
-void ConsultarSaldo();
+void ConsultarSaldo(CPointer pClients, int userIndex);
 
 void ConsultarExtrato(EPointer ppExtrato, int index);
 
 bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CPointer pClients, int userIndex, char TipoTransacao, double quantidade);
 
-void DepositarReais();
+void DepositarReais(CPointer pClients, int userIndex, EPointer ppExtrato);
 
-void SacarReais();
+void SacarReais(CPointer pClients, int userIndex, char userSenha[7], EPointer ppExtrato);
 
-void ComprarCriptomoedas();
+void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple, EPointer ppExtrato);
 
 void VenderCriptomoedas();
 
@@ -262,11 +262,11 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        if(respostaUser[0] == '1') ConsultarSaldo();
+        if(respostaUser[0] == '1') ConsultarSaldo(pClients, userIndex);
         else if(respostaUser[0] == '2') ConsultarExtrato(ppExtrato, userIndex);
         else if(respostaUser[0] == '3') DepositarReais(pClients, userIndex, ppExtrato);
-        else if(respostaUser[0] == '4') SacarReais();
-        else if(respostaUser[0] == '5') ComprarCriptomoedas();
+        else if(respostaUser[0] == '4') SacarReais(pClients, userIndex, userSenha, ppExtrato);
+        else if(respostaUser[0] == '5') ComprarCriptomoedas(pClients, userIndex, &pCriptos[0], &pCriptos[1], &pCriptos[2], ppExtrato);
         else if(respostaUser[0] == '6') VenderCriptomoedas();
         else if(respostaUser[0] == '7') AtualizarCotacoes();
         else if(respostaUser[0] == '8') {
@@ -457,7 +457,20 @@ int PedirSenha(char userSenhaCerta[7]){
     }
 }
 
-void ConsultarSaldo(){
+void ConsultarSaldo(CPointer pClients, int userIndex){
+
+    limparTerminal();
+
+    printf("===== Consulta de Saldo =====\n\n");
+    printf("Nome: %s\n", pClients[userIndex].Nome);
+    printf("Saldo em Reais: R$ %.2lf\n", pClients[userIndex].Reais);
+    printf("Saldo em Bitcoin: %.8lf BTC\n", pClients[userIndex].Bitcoin);
+    printf("Saldo em Ethereum: %.8lf ETH\n", pClients[userIndex].Ethereum);
+    printf("Saldo em Ripple: %.8lf XRP\n", pClients[userIndex].Ripple);
+
+    getchar();
+
+
 
 }
 
@@ -579,11 +592,11 @@ void DepositarReais(CPointer pClients, int userIndex, EPointer ppExtrato){
 
 }
 
-void SacarReais(){
+void SacarReais(CPointer pClients, int userIndex, char userSenha[7], EPointer ppExtrato){
 
 }
 
-void ComprarCriptomoedas(){
+void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple, EPointer ppExtrato){
 
 }
 
