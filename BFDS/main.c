@@ -594,9 +594,52 @@ void DepositarReais(CPointer pClients, int userIndex, EPointer ppExtrato){
 
 void SacarReais(CPointer pClients, int userIndex, char userSenha[7], EPointer ppExtrato){
 
+
+    limparTerminal();
+
+
+    int pedirSenhaSaque = PedirSenha(userSenha);
+    double saque;
+    
+    if(pedirSenhaSaque == 1){  
+        printf("Quantos reais gostaria de sacar?: ");
+        scanf(" %lf", &saque);
+
+        if(saque <= 0) { 
+            printf("[ERRO]! Valor inválido.\n O saque deve ser maior que zero.\n");
+            getchar();
+            return;
+        }
+
+        if(pClients[userIndex].Reais < saque){  
+            printf("Em sua conta não a saldo suficiente para realizar essa operação!\n");
+
+            getchar();
+        }
+        else{
+            pClients[userIndex].Reais = pClients[userIndex].Reais - saque;  
+
+            printf("R$ %.2lf sacados da sua conta!\n", saque);
+            printf("Saldo Atual: R$ %.2lf\n", pClients[userIndex].Reais);
+            AdicionarExtrato(ppExtrato, NULL, "Reais", pClients, userIndex, 'S', saque);
+
+            getchar();
+        }
+    }
+    else{
+        printf("Senha incorreta! Operação cancelada.\n");
+        getchar();
+
+    }
+
+
+
+
 }
 
 void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple, EPointer ppExtrato){
+
+
 
 }
 
