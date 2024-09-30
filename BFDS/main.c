@@ -662,6 +662,12 @@ void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPo
 
     limparTerminal();
 
+    if(valorCompra <= 0){
+        printf("O valor deve ser maior que zero!\n");
+        getchar();
+        return;
+    }
+
     if (valorCompra > pClients[userIndex].Reais) {
         printf("Saldo insuficiente para realizar a operação!.\n");
         getchar();
@@ -707,7 +713,7 @@ void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPo
                 break;
         }
 
-                switch(opcaoMoeda) {
+        switch(opcaoMoeda) {
         case 1: 
             AdicionarExtrato(ppExtrato, bitcoin, "Bitcoin", pClients, userIndex, 'C', valorCripto); 
             break;
