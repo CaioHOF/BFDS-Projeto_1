@@ -517,7 +517,7 @@ bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CP
     }
 
     if(criptoIndex != -1){
-        strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TipoMoeda, pClients[userIndex].Nome);
+        strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TipoMoeda, pCriptos[criptoIndex].Nome);
         ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].ValorDaMoedaNaTroca = pCriptos[criptoIndex].Valor;
     }
     else{
