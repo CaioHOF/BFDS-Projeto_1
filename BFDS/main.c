@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
     }
     //menu
     while(true){
-        system("clear");
+        limparTerminal();
         printf("Bem vindo %s!!\n\n", pClients[userIndex].Nome);
         sleep(2);
         printf("     _-+={Menu}=+-_     \n\n");
