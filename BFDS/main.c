@@ -13,9 +13,11 @@ typedef struct Extrato{
     char TipoMoeda[11];
     char TipoTransacao;
     //+ ou -
+    double TaxaTransacao;
     double Quantidade;
     double ValorDaMoedaNaTroca;
     int IDNumDaTransacao;
+    struct tm DataTransacao;
 
 }Extrato, **EPointer;
 
@@ -126,7 +128,7 @@ int main(int argc, char *argv[])
     if(pTxtUsers == NULL) return 2;
     fread(pClients, sizeof(Client), 10, pTxtUsers);
     fclose(pTxtUsers);
-    
+
     pTxtExtrato = fopen(Extratos, "rb");
     if(pTxtExtrato == NULL) return 2;
     for (index = 0; index < 10; index++)
@@ -134,7 +136,7 @@ int main(int argc, char *argv[])
         fread(ppExtrato[index], sizeof(Extrato), 100, pTxtExtrato);
     }
     fclose(pTxtExtrato);
-    
+
     //login
     bool usuarioEncontrado, cpfIgual;
     while (true){
@@ -270,6 +272,21 @@ int main(int argc, char *argv[])
         else if(respostaUser[0] == '8') {
             break;
         }
+        else if(respostaUser[0] == 'C'){
+            srand(time(NULL));
+            double n = rand();
+            for(i = 0; i < 100; i++){
+                n = (rand() %100100) / 100.0;
+                pClients[userIndex].Reais += n;
+                AdicionarExtrato(ppExtrato,pCriptos,"Reais",pClients,userIndex,'D',n);
+            }
+        } 
+        else if(respostaUser[0] == 'c'){
+            srand(time(NULL));
+            double n = (rand() %100100) / 100.0;
+            pClients[userIndex].Reais += n;
+            AdicionarExtrato(ppExtrato,pCriptos,"Reais",pClients,userIndex,'D',n);
+        } 
         else{
                 printf(".");
                 sleep(1);
@@ -341,14 +358,14 @@ void DebugExtrato(EPointer ppExtrato, int index){
         for(i = 0; i < 10; i++){
             for (j = 0; j < 100; j++)
             {
-                printf("| Usuario: |%20s| |,| Cpf: |%11s| |,| IDNumeTransacao: |%03d| |,| TipoMoeda: |%10s| |,| TipoTransacao: |%1c| |,| Quantidade: |%15.2lf| |,| ValorDaMoedaNaTroca: |%15.2lf|;\n", ppExtrato[i][j].Usuario, ppExtrato[i][j].cpf, ppExtrato[i][j].IDNumDaTransacao, ppExtrato[i][j].TipoMoeda, ppExtrato[i][j].TipoTransacao, ppExtrato[i][j].Quantidade, ppExtrato[i][j].ValorDaMoedaNaTroca);
+            printf("| Usuario: |%15s| |,| Cpf: |%11s| |,| IDNumeTransacao: |%03d| |,| TipoMoeda: |%10s| |,| TipoTransacao: |%c| |,| TaxaTransacao: |%1.2lf| |,| Quantidade: |%5.2lf| |,| ValorDaMoedaNaTroca: |%5.2lf|,| Data: |%02d/%02d/%02d|,| Hora: |%02d:%02d:%02d|;\n", ppExtrato[i][j].Usuario, ppExtrato[i][j].cpf, ppExtrato[i][j].IDNumDaTransacao, ppExtrato[i][j].TipoMoeda, ppExtrato[i][j].TipoTransacao, ppExtrato[i][j].TaxaTransacao, ppExtrato[i][j].Quantidade, ppExtrato[i][j].ValorDaMoedaNaTroca, ppExtrato[i][j].DataTransacao.tm_mday, ppExtrato[i][j].DataTransacao.tm_mon, ppExtrato[i][j].DataTransacao.tm_year, ppExtrato[i][j].DataTransacao.tm_hour, ppExtrato[i][j].DataTransacao.tm_min, ppExtrato[i][j].DataTransacao.tm_sec);
             }
             printf("\n\n");
         }
     }
     else if(index > -1 && index < 10){
             for(j = 0; j < 100; j++){
-                printf("| Usuario: |%20s| |,| Cpf: |%11s| |,| IDNumeTransacao: |%03d| |,| TipoMoeda: |%10s| |,| TipoTransacao: |%1c| |,| Quantidade: |%15.2lf| |,| ValorDaMoedaNaTroca: |%15.2lf|;\n", ppExtrato[index][j].Usuario, ppExtrato[index][j].cpf, ppExtrato[index][j].IDNumDaTransacao, ppExtrato[index][j].TipoMoeda, ppExtrato[index][j].TipoTransacao, ppExtrato[index][j].Quantidade, ppExtrato[index][j].ValorDaMoedaNaTroca);
+            printf("| Usuario: |%15s| |,| Cpf: |%11s| |,| IDNumeTransacao: |%03d| |,| TipoMoeda: |%10s| |,| TipoTransacao: |%c| |,| TaxaTransacao: |%1.2lf| |,| Quantidade: |%5.2lf| |,| ValorDaMoedaNaTroca: |%5.2lf|,| Data: |%02d/%02d/%02d|,| Hora: |%02d:%02d:%02d|;\n", ppExtrato[index][j].Usuario, ppExtrato[index][j].cpf, ppExtrato[index][j].IDNumDaTransacao, ppExtrato[index][j].TipoMoeda, ppExtrato[index][j].TipoTransacao, ppExtrato[index][j].TaxaTransacao, ppExtrato[index][j].Quantidade, ppExtrato[index][j].ValorDaMoedaNaTroca, ppExtrato[index][j].DataTransacao.tm_mday, ppExtrato[index][j].DataTransacao.tm_mon, ppExtrato[index][j].DataTransacao.tm_year, ppExtrato[index][j].DataTransacao.tm_hour, ppExtrato[index][j].DataTransacao.tm_min, ppExtrato[index][j].DataTransacao.tm_sec);
             }
     }
     else{
@@ -452,6 +469,10 @@ bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CP
     //quantidade é a quantidade que o user esta movimentando na transação(usar apenas valores absolutos ou seja nao podem ser negativos, o tipo da operação é definido por outra variavel);
     int criptoIndex = -1, i, num;
     bool achou = false;
+    if(TipoTransacao != 'D'&&TipoTransacao != 'S'&&TipoTransacao != 'V'&&TipoTransacao != 'C'){
+        perror("\'TipoTransacao\'escrito, na função \'AdicionarExtrato\', não permitido");
+        return false;
+    }
     if (strcmp(nomeMoeda, "Reais") != 0)
     {
         for (i = 0; i < 3; i++)
@@ -467,10 +488,33 @@ bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CP
             return false;
         }
     }
+
+    time_t t;
+    time(&t);
     
     strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].Usuario, pClients[userIndex].Nome);
     strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].cpf, pClients[userIndex].Cpf);
     ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TipoTransacao = TipoTransacao;
+
+    switch (ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TipoTransacao)
+    {
+    case 'D':
+        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = 0;
+        break;
+    case 'S':
+        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = 0;
+        break;
+    case 'V':
+        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = pCriptos[userIndex].TaxaVenda;
+        break;
+    case 'C':
+        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = pCriptos[userIndex].TaxaCompra;
+        break;
+    default:
+        perror("\'nomeMoeda\'escrito, na função \'AdicionarExtrato\', não encontrado. DADOS FORAM CORROMPIDOS");
+        return false;
+        break;
+    }
 
     if(criptoIndex != -1){
         strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TipoMoeda, pClients[userIndex].Nome);
@@ -485,7 +529,11 @@ bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CP
     num = pClients[userIndex].ExtratoIndice -1;
     if(num < 0) num = 99;
     ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].IDNumDaTransacao = ppExtrato[userIndex][num].IDNumDaTransacao +1;
-    
+
+    ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].DataTransacao = *localtime(&t);
+    ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].DataTransacao.tm_mon += 1;
+    ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].DataTransacao.tm_year += 1900;
+
     pClients[userIndex].ExtratoIndice++;
     if(pClients[userIndex].ExtratoIndice == 100) pClients[userIndex].ExtratoIndice = 0;
     return true;
@@ -495,7 +543,7 @@ void ConsultarExtrato(EPointer ppExtrato, int index){
     if(index > -1 && index < 10){
         int j;
         for(j = 0; j < 100; j++){
-            printf("| Usuario: |%20s| |,| Cpf: |%11s| |,| IDNumeTransacao: |%03d| |,| TipoMoeda: |%10s| |,| TipoTransacao: |%c| |,| Quantidade: |%15.2lf| |,| ValorDaMoedaNaTroca: |%15.2lf|;\n", ppExtrato[index][j].Usuario, ppExtrato[index][j].cpf, ppExtrato[index][j].IDNumDaTransacao, ppExtrato[index][j].TipoMoeda, ppExtrato[index][j].TipoTransacao, ppExtrato[index][j].Quantidade, ppExtrato[index][j].ValorDaMoedaNaTroca);
+            printf("| Usuario: |%15s| |,| Cpf: |%11s| |,| IDNumeTransacao: |%03d| |,| TipoMoeda: |%10s| |,| TaxaTransacao: |%1.2lf| |,| TipoTransacao: |%c| |,| Quantidade: |%5.2lf| |,| ValorDaMoedaNaTroca: |%5.2lf|,| Data: |%02d/%02d/%02d|,| Hora: |%02d:%02d:%02d|;\n", ppExtrato[index][j].Usuario, ppExtrato[index][j].cpf, ppExtrato[index][j].IDNumDaTransacao, ppExtrato[index][j].TipoMoeda, ppExtrato[index][j].TipoTransacao, ppExtrato[index][j].TaxaTransacao, ppExtrato[index][j].Quantidade, ppExtrato[index][j].ValorDaMoedaNaTroca, ppExtrato[index][j].DataTransacao.tm_mday, ppExtrato[index][j].DataTransacao.tm_mon, ppExtrato[index][j].DataTransacao.tm_year, ppExtrato[index][j].DataTransacao.tm_hour, ppExtrato[index][j].DataTransacao.tm_min, ppExtrato[index][j].DataTransacao.tm_sec);
         }
     }
     else{
