@@ -75,7 +75,7 @@ void DepositarReais(CPointer pClients, int userIndex, EPointer ppExtrato);
 
 void SacarReais(CPointer pClients, int userIndex, char userSenha[7], EPointer ppExtrato);
 
-void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple, EPointer ppExtrato);
+void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple, EPointer ppExtrato, char userSenha[7]);
 
 void VenderCriptomoedas();
 
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
         else if(respostaUser[0] == '2') ConsultarExtrato(ppExtrato, userIndex);
         else if(respostaUser[0] == '3') DepositarReais(pClients, userIndex, ppExtrato);
         else if(respostaUser[0] == '4') SacarReais(pClients, userIndex, userSenha, ppExtrato);
-        else if(respostaUser[0] == '5') ComprarCriptomoedas(pClients, userIndex, &pCriptos[0], &pCriptos[1], &pCriptos[2], ppExtrato);
+        else if(respostaUser[0] == '5') ComprarCriptomoedas(pClients, userIndex, &pCriptos[0], &pCriptos[1], &pCriptos[2], ppExtrato, userSenha);
         else if(respostaUser[0] == '6') VenderCriptomoedas();
         else if(respostaUser[0] == '7') AtualizarCotacoes();
         else if(respostaUser[0] == '8') {
@@ -637,15 +637,18 @@ void SacarReais(CPointer pClients, int userIndex, char userSenha[7], EPointer pp
 
 }
 
-void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple, EPointer ppExtrato){
+void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple, EPointer ppExtrato, char userSenha[7]){
 
     char respostaUser[20];
     double valorCompra, valorFinal;
     double taxa, valorCripto;
     int opcaoMoeda;
+    int pedirSenhaSaque = PedirSenha(userSenha);
 
     limparTerminal();
 
+
+    if(pedirSenhaSaque == 1){ 
     printf("Qual criptomoeda deseja comprar?!\n");
     printf("1 - Bitcoin\n");
     printf("2 - Ethereum\n");
@@ -727,6 +730,12 @@ void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPo
         limparTerminal();
         printf("Compra cancelada!\n");
         getchar();
+    }
+    }
+    else{
+        printf("Senha incorreta! Operação cancelada.\n");
+        getchar();
+
     }
 
 
