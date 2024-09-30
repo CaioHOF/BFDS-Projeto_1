@@ -11,7 +11,7 @@ O projeto é a simuação de uma exchange de criptomoedas (Bitcoin, Ethereum e R
 
 # 🔧 Uso do Programa
 
-O programa pode ser executado tanto em IDEs instalados em uma máquina quanto em IDEs online. Caso o programa que você está usando não tenha embutido, certifique-se de instalar a extensão de C/C++. Ao executar o arquivo "main.c", uma tela de login será aberta. Segue a lista dos perfis criados:
+O programa pode ser executado tanto em IDEs instalados em uma máquina quanto em IDEs online. Caso o programa que você está usando não tenha embutido, certifique-se de instalar a extensão de C/C++. Caso você esteja usando o Replit, retire todos os arquivos da pasta "BFDS" ao descompactar o arquivo .zip. Ao executar o arquivo "main.c", uma tela de login será aberta. Segue a lista dos perfis criados:
 
 Em ordem: Nome, CPF, senha, R$ na conta, BTC na conta, ETH na conta, XRP na conta.
 
