@@ -77,9 +77,9 @@ void SacarReais(CPointer pClients, int userIndex, char userSenha[7], EPointer pp
 
 void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple, EPointer ppExtrato, char userSenha[7]);
 
-void VenderCriptomoedas();
+void VenderCriptomoedas(CPointer pClients, int userIndex, MPointer PCriptos, EPointer ppExtrato);
 
-void AtualizarCotacoes();
+void AtualizarCotacoes(MPointer pCriptos);
 
 
 int main(int argc, char *argv[]) 
@@ -269,8 +269,8 @@ int main(int argc, char *argv[])
         else if(respostaUser[0] == '3') DepositarReais(pClients, userIndex, ppExtrato);
         else if(respostaUser[0] == '4') SacarReais(pClients, userIndex, userSenha, ppExtrato);
         else if(respostaUser[0] == '5') ComprarCriptomoedas(pClients, userIndex, &pCriptos[0], &pCriptos[1], &pCriptos[2], ppExtrato, userSenha);
-        else if(respostaUser[0] == '6') VenderCriptomoedas();
-        else if(respostaUser[0] == '7') AtualizarCotacoes();
+        else if(respostaUser[0] == '6') VenderCriptomoedas(pClients, userIndex, pCriptos, ppExtrato);
+        else if(respostaUser[0] == '7') AtualizarCotacoes(pCriptos);
         else if(respostaUser[0] == '8') {
             break;
         }
@@ -521,8 +521,10 @@ bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CP
         break;
     case 'V':
         ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = pCriptos[criptoIndex].TaxaVenda;
+        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = pCriptos[criptoIndex].TaxaVenda;
         break;
     case 'C':
+        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = pCriptos[criptoIndex].TaxaCompra;
         ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = pCriptos[criptoIndex].TaxaCompra;
         break;
     default:
@@ -750,12 +752,195 @@ void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPo
 
 }
 
-void VenderCriptomoedas(){
+void VenderCriptomoedas(CPointer pClients, int userIndex, MPointer pCriptos, EPointer ppExtrato){
+    char respostaUser[20];
+    double valorVenda, valorFinal;
+    double taxa, valorConvertido;
+    int opcaoMoeda;
 
+    limparTerminal();
+
+    printf("Qual criptomoeda deseja vender?\n");
+    printf("1 - Bitcoin\n");
+    printf("2 - Ethereum\n");
+    printf("3 - Ripple\n");
+    scanf("%d", &opcaoMoeda);
+
+    limparTerminal();
+
+    switch(opcaoMoeda) {
+    case 1: 
+
+        printf("Digite o valor de Bitcoin que você deseja converter para reais:\n");
+        scanf("%lf", &valorVenda);
+        if (valorVenda > pClients[userIndex].Bitcoin) {
+            printf("Saldo insuficiente para realizar a operação.\n");
+            getchar();
+            return;
+        } 
+        else if (valorVenda <0){
+            printf("Valor inválido, tente novamente.");
+            getchar();
+            return;
+        }
+
+        
+        else{
+            valorConvertido = valorVenda * (pCriptos[0].Valor);
+            taxa = valorConvertido * (pCriptos[0].TaxaVenda);
+            valorFinal = valorConvertido - taxa;
+            printf("Com o valor investido você transformará %.2lf Bitcoins em R$:%.2lf Reais, com uma taxa de R$:%.2lf.\nO total da transação será de R$:%.2lf.\nConfirmar? (s/n)\n",valorVenda, valorFinal, taxa, (valorConvertido));
+            scanf(" %s", respostaUser);
+            if (respostaUser[0] == 's') {
+                pClients[userIndex].Reais += (valorFinal);
+                pClients[userIndex].Bitcoin -= (valorVenda); 
+                limparTerminal();
+                printf("Compra realizada com sucesso!\n");
+                getchar();   
+                break; 
+            }
+        else {
+            limparTerminal();
+            printf("Compra cancelada!\n");
+            getchar();
+            break;
+        }
+    }
+    limparTerminal();
+
+    case 2: 
+        printf("Digite o valor de Ethereum que você deseja converter para reais:\n");
+        scanf("%lf", &valorVenda);
+        if (valorVenda > pClients[userIndex].Ethereum) {
+            printf("Saldo insuficiente para realizar a operação.\n");
+            getchar();
+            return;
+        }
+            else if (valorVenda <0){
+            printf("Valor inválido, tente novamente.");
+            getchar();
+            return;
+        }
+        else{
+            valorConvertido = valorVenda * (pCriptos[1].Valor);
+            taxa = valorConvertido * (pCriptos[1].TaxaVenda);
+            valorFinal = valorConvertido - taxa;
+            printf("Com o valor investido você transformará %.2lf Ethereum em R$:%.2lf Reais, com uma taxa de R$:%.2lf.\nO total da transação será de R$:%.2lf.\nConfirmar? (s/n)\n",valorVenda, valorFinal, taxa, (valorConvertido));
+            scanf(" %s", respostaUser);
+            if (respostaUser[0] == 's') {
+                pClients[userIndex].Reais += (valorFinal);
+                pClients[userIndex].Ethereum -= (valorVenda); 
+                limparTerminal();
+                printf("Compra realizada com sucesso!\n");
+                getchar();   
+                break; 
+            }
+        else {
+            limparTerminal();
+            getchar();
+            break;
+        }
+    }
+    limparTerminal();
+
+    case 3: 
+        printf("Digite o valor de Ripple que você deseja converter para reais:\n");
+        scanf("%lf", &valorVenda);
+        if (valorVenda > pClients[userIndex].Ripple) {
+            printf("Saldo insuficiente para realizar a operação.\n");
+            getchar();
+            return;
+        }
+        else if (valorVenda <0){
+            printf("Valor inválido, tente novamente.");
+            getchar();
+            return;
+        }
+        else{
+            valorConvertido = valorVenda * (pCriptos[2].Valor);
+            taxa = valorConvertido * (pCriptos[2].TaxaVenda);
+            valorFinal = valorConvertido - taxa;
+            printf("Com o valor investido você transformará %.2lf Ripple em R$:%.2lf Reais, com uma taxa de R$:%.2lf.\nO total da transação será de R$:%.2lf.\nConfirmar? (s/n)\n",valorVenda, valorFinal, taxa, (valorConvertido));
+            scanf(" %s", respostaUser);
+            if (respostaUser[0] == 's') {
+                pClients[userIndex].Reais += (valorFinal);
+                pClients[userIndex].Ripple -= (valorVenda); 
+                limparTerminal();
+                printf("Compra realizada com sucesso!\n");
+                getchar();   
+                break; 
+            }
+        else {
+            limparTerminal();
+            printf("Compra cancelada!\n");
+            getchar();
+            break;
+        }
+    }
+        limparTerminal();
+
+    default:
+        printf("Opção inválida.\n");
+        printf("\nPressione Enter para voltar ao menu principal\n");
+        return;
+        }
+    switch(opcaoMoeda){
+        case 1:
+        AdicionarExtrato(ppExtrato, pCriptos, pCriptos[0].Nome, pClients, userIndex, 'V', valorFinal);
+        break;
+        case 2:
+        AdicionarExtrato(ppExtrato, pCriptos, pCriptos[1].Nome, pClients, userIndex, 'V', valorFinal);
+        break;
+        case 3:
+        AdicionarExtrato(ppExtrato, pCriptos, pCriptos[2].Nome, pClients, userIndex, 'V', valorFinal);
+        break;
+        default:
+        printf("Erro, Extrato Inválido.");
+        getchar();
+    }
+    limparTerminal();
 }
 
-void AtualizarCotacoes(){
+void AtualizarCotacoes(MPointer pCriptos){
+    srand(time(NULL));
+    int CotacaoBTC, CotacaoETH ,CotacaoXRP;
+    char respostaUser[20];
+    
+    limparTerminal();
+    
+    while (true){
+        printf("A cotação das moedas é: %.2lf Reais/Bitcoin, %.2lf Reais/Ethereum, %.2lf Reais/Ripple.\n", pCriptos[0].Valor, pCriptos[1].Valor, pCriptos[2].Valor);
+        printf("Deseja atualizar? (s/n) \n");
+        scanf("%s", respostaUser);
+        if (respostaUser[0] == 's'){
+            printf("Processando novos valores...\n");
+            sleep(4);
 
+            int CotacaoBTC = (rand() % 11) - 5;
+            int CotacaoETH = (rand() % 11) - 5;
+            int CotacaoXRP = (rand() % 11) - 5;
+
+            pCriptos[0].Valor = pCriptos[0].Valor +(CotacaoBTC*pCriptos[0].Valor *0.01);
+            pCriptos[1].Valor = pCriptos[1].Valor +(CotacaoETH*pCriptos[1].Valor *0.01);
+            pCriptos[2].Valor = pCriptos[2].Valor +(CotacaoXRP*pCriptos[2].Valor *0.01);
+
+            printf("A nova cotação das moedas é: %.2lf Reais/Bitcoin, %.2lf Reais/Ethereum, %.2lf Reais/Ripple.\n", pCriptos[0].Valor, pCriptos[1].Valor, pCriptos[2].Valor);
+            printf("Aperte enter para voltar ao menu principal.\n");
+            getchar();
+            getchar();
+            return;
+        }
+        else if (respostaUser[0] == 'n'){
+            printf("Aperte enter para voltar ao menu principal.\n");
+            getchar();
+            getchar();
+            return;
+        }
+        else{
+            printf("Resposta inválida! Tente novamente.\n");
+        }
+    }
+    limparTerminal();
 }
 
 
