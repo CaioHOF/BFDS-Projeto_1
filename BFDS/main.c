@@ -530,7 +530,7 @@ bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CP
     }
 
     if(criptoIndex != -1){
-        strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TipoMoeda, pClients[userIndex].Nome);
+        strcpy(ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TipoMoeda, pCriptos[criptoIndex].Nome);            //AQUI
         ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].ValorDaMoedaNaTroca = pCriptos[criptoIndex].Valor;
     }
     else{
@@ -639,6 +639,95 @@ void SacarReais(CPointer pClients, int userIndex, char userSenha[7], EPointer pp
 
 void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPointer ethereum, MPointer ripple, EPointer ppExtrato){
 
+    char respostaUser[20];
+    double valorCompra, valorFinal;
+    double taxa, valorCripto;
+    int opcaoMoeda;
+
+    limparTerminal();
+
+    printf("Qual criptomoeda deseja comprar?!\n");
+    printf("1 - Bitcoin\n");
+    printf("2 - Ethereum\n");
+    printf("3 - Ripple\n");
+    scanf("%d", &opcaoMoeda);
+
+    limparTerminal();
+
+    printf("Digite o valor que você deseja investir (em reais):\n");
+    scanf("%lf", &valorCompra);
+
+    limparTerminal();
+
+    if (valorCompra > pClients[userIndex].Reais) {
+        printf("Saldo insuficiente para realizar a operação!.\n");
+        getchar();
+        return;
+    }
+
+    switch(opcaoMoeda) {
+    case 1: 
+        taxa = valorCompra * bitcoin->TaxaCompra;  
+        valorCripto = (valorCompra - taxa) / bitcoin->Valor;  
+        printf("Com o valor investido você comprará %.10lf Bitcoins, com uma taxa de R$%.2lf\nO total da transação será de R$%.2lf.\nConfirmar? (s/n)\n", valorCripto, taxa, (valorCompra+taxa));
+        break;
+    case 2: 
+        taxa = valorCompra * ethereum->TaxaCompra;  
+        valorCripto = (valorCompra - taxa) / ethereum->Valor;  
+        printf("Com o valor investido você comprará %.10lf Ethereums, com uma taxa de R$%.2lf\nO total da transação será de R$%.2lf.\nConfirmar? (s/n)\n", valorCripto, taxa, (valorCompra+taxa));
+        break;
+    case 3: 
+        taxa = valorCompra * ripple->TaxaCompra;  
+        valorCripto = (valorCompra - taxa) / ripple->Valor;  
+        printf("Com o valor investido você comprará %.10lf Ripples, com uma taxa de R$%.2lf\nO total da transação será de R$%.2lf.\nConfirmar? (s/n)\n", valorCripto, taxa, (valorCompra+taxa));
+        break;
+    default:
+        printf("Opção inválida.\n");
+        return;
+    }
+
+    
+    scanf(" %s", respostaUser);
+    if (respostaUser[0] == 's') {
+        pClients[userIndex].Reais -= (valorCompra + taxa); 
+
+
+        switch(opcaoMoeda) {
+            case 1:
+                pClients[userIndex].Bitcoin += valorCripto;
+                break;
+            case 2:
+                pClients[userIndex].Ethereum += valorCripto;
+                break;
+            case 3:
+                pClients[userIndex].Ripple += valorCripto;
+                break;
+        }
+
+                switch(opcaoMoeda) {
+        case 1: 
+            AdicionarExtrato(ppExtrato, bitcoin, "Bitcoin", pClients, userIndex, 'C', valorCripto); 
+            break;
+        case 2: 
+            AdicionarExtrato(ppExtrato, ethereum, "Ethereum", pClients, userIndex, 'C', valorCripto);
+            break;
+        case 3: 
+            AdicionarExtrato(ppExtrato, ripple, "Ripple", pClients, userIndex, 'C', valorCripto); 
+            break;
+        default:
+            printf("[ERRO] Extrato Inválido.\n");
+            getchar();
+            return;
+        }
+
+        limparTerminal();
+        printf("Compra realizada com sucesso!\n");
+        getchar();
+    } else {
+        limparTerminal();
+        printf("Compra cancelada!\n");
+        getchar();
+    }
 
 
 }
