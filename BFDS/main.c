@@ -505,10 +505,10 @@ bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CP
         ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = 0;
         break;
     case 'V':
-        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = pCriptos[userIndex].TaxaVenda;
+        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = pCriptos[criptoIndex].TaxaVenda;
         break;
     case 'C':
-        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = pCriptos[userIndex].TaxaCompra;
+        ppExtrato[userIndex][pClients[userIndex].ExtratoIndice].TaxaTransacao = pCriptos[criptoIndex].TaxaCompra;
         break;
     default:
         perror("\'nomeMoeda\'escrito, na função \'AdicionarExtrato\', não encontrado. DADOS FORAM CORROMPIDOS");
