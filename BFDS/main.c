@@ -45,20 +45,38 @@ typedef struct Moeda{
 }Moeda, *MPointer;
 
 
+//funções do sistema
 void DebugCotacoes(MPointer pCriptos, int index);
+
 void DebugUser(CPointer pClients, int index);
+
 void DebugExtrato(EPointer ppExtrato, int index);
+
 void SaveCotacoes(MPointer pCriptos, const char *nomeArquivo);
+
 void SaveUsers(CPointer pClients, const char *nomeArquivo);
+
 void SaveExtratos(EPointer ppExtrato, const char *nomeArquivo);
+
 int PedirSenha(char userSenha[7]);
+
+void limparTerminal();
+
+//Funções do Usuario
 void ConsultarSaldo();
+
 void ConsultarExtrato(EPointer ppExtrato, int index);
+
 bool AdicionarExtrato(EPointer ppExtrato, MPointer pCriptos, char *nomeMoeda, CPointer pClients, int userIndex, char TipoTransacao, double quantidade);
+
 void DepositarReais();
+
 void SacarReais();
+
 void ComprarCriptomoedas();
+
 void VenderCriptomoedas();
+
 void AtualizarCotacoes();
 
 
@@ -504,4 +522,9 @@ void VenderCriptomoedas(){
 
 void AtualizarCotacoes(){
 
+}
+
+
+void limparTerminal() {
+    printf("\033[H\033[J");
 }
