@@ -85,6 +85,8 @@ void AtualizarCotacoes();
 int main(int argc, char *argv[]) 
 {
     setlocale(LC_ALL, "portuguese");
+    setenv("TZ","America/Sao_Paulo",1);
+    tzset();
     srand(time(NULL));
     
     FILE *pTxtCotacoes, *pTxtUsers, *pTxtExtrato;
