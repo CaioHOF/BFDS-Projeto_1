@@ -682,17 +682,17 @@ void ComprarCriptomoedas(CPointer pClients, int userIndex, MPointer bitcoin, MPo
     switch(opcaoMoeda) {
     case 1: 
         taxa = valorCompra * bitcoin->TaxaCompra;  
-        valorCripto = (valorCompra - taxa) / bitcoin->Valor;  
+        valorCripto = valorCompra / bitcoin->Valor;  
         printf("Com o valor investido você comprará %.10lf Bitcoins, com uma taxa de R$%.2lf\nO total da transação será de R$%.2lf.\nConfirmar? (s/n)\n", valorCripto, taxa, (valorCompra+taxa));
         break;
     case 2: 
         taxa = valorCompra * ethereum->TaxaCompra;  
-        valorCripto = (valorCompra - taxa) / ethereum->Valor;  
+        valorCripto = valorCompra / ethereum->Valor;  
         printf("Com o valor investido você comprará %.10lf Ethereums, com uma taxa de R$%.2lf\nO total da transação será de R$%.2lf.\nConfirmar? (s/n)\n", valorCripto, taxa, (valorCompra+taxa));
         break;
     case 3: 
         taxa = valorCompra * ripple->TaxaCompra;  
-        valorCripto = (valorCompra - taxa) / ripple->Valor;  
+        valorCripto = valorCompra / ripple->Valor;  
         printf("Com o valor investido você comprará %.10lf Ripples, com uma taxa de R$%.2lf\nO total da transação será de R$%.2lf.\nConfirmar? (s/n)\n", valorCripto, taxa, (valorCompra+taxa));
         break;
     default:
